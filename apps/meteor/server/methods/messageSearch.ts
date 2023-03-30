@@ -36,13 +36,14 @@ Meteor.methods<ServerMethods>({
 			if (!(await canAccessRoomIdAsync(rid, currentUserId))) {
 				return false;
 			}
-		} else if (settings.get('Search.defaultProvider.GlobalSearchEnabled') !== true) {
-			return {
-				message: {
-					docs: [],
-				},
-			};
 		}
+		// else if (settings.get('Search.defaultProvider.GlobalSearchEnabled') !== true) {
+		// 	return {
+		// 		message: {
+		// 			docs: [],
+		// 		},
+		// 	};
+		// }
 
 		const user = (await Meteor.userAsync()) as IUser | undefined;
 
@@ -75,6 +76,8 @@ Meteor.methods<ServerMethods>({
 				$in: user?._id ? (await Subscriptions.findByUserId(user._id).toArray()).map((subscription: ISubscription) => subscription.rid) : [],
 			};
 		}
+
+		console.log('query', query);
 
 		return {
 			message: {

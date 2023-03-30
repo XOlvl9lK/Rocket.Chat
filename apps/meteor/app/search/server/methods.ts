@@ -36,7 +36,10 @@ Meteor.methods<ServerMethods>({
 			resultTemplate: provider.resultTemplate,
 			supportsSuggestions: provider.supportsSuggestions,
 			suggestionItemTemplate: provider.suggestionItemTemplate,
-			settings: Object.fromEntries(Object.values(provider.settingsAsMap).map((setting) => [setting.key, setting.value] as const)),
+			settings: {
+				...Object.fromEntries(Object.values(provider.settingsAsMap).map((setting) => [setting.key, setting.value] as const)),
+				GlobalSearchEnabled: true,
+			},
 		};
 	},
 	/**

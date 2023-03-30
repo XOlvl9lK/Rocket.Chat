@@ -5,6 +5,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import tinykeys from 'tinykeys';
 
 import SearchList from '../../search/SearchList';
+import GlobalSearchList from '/client/sidebar/search/GlobalSearchList';
 
 const Search: VFC<Omit<HTMLAttributes<HTMLElement>, 'is'>> = (props) => {
 	const [searchOpen, setSearchOpen] = useState(false);
@@ -40,7 +41,7 @@ const Search: VFC<Omit<HTMLAttributes<HTMLElement>, 'is'>> = (props) => {
 	return (
 		<>
 			<Sidebar.TopBar.Action icon='magnifier' onClick={openSearch} {...props} />
-			{searchOpen && <SearchList ref={ref} onClose={handleCloseSearch} />}
+			{searchOpen && <GlobalSearchList ref={ref} onClose={handleCloseSearch} />}
 		</>
 	);
 };
