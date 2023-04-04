@@ -5,7 +5,7 @@ import { check } from 'meteor/check';
 import { TAPi18n } from 'meteor/rocketchat:tap-i18n';
 import EJSON from 'ejson';
 import { DDPRateLimiter } from 'meteor/ddp-rate-limiter';
-import { escapeHTML } from '@rocket.chat/string-helpers';
+import { escapeHTML, escapeRegExp } from '@rocket.chat/string-helpers';
 import {
 	isShieldSvgProps,
 	isSpotlightProps,
@@ -16,7 +16,7 @@ import {
 	validateParamsPwGetPolicyRest,
 } from '@rocket.chat/rest-typings';
 import type { IUser } from '@rocket.chat/core-typings';
-import { Users } from '@rocket.chat/models';
+import { Users as UsersRaw } from '@rocket.chat/models';
 
 import { hasPermissionAsync } from '../../../authorization/server/functions/hasPermission';
 import { settings } from '../../../settings/server';
@@ -26,6 +26,7 @@ import { getURL } from '../../../utils/lib/getURL';
 import { getLogs } from '../../../../server/stream/stdout';
 import { SystemLogger } from '../../../../server/lib/logger/system';
 import { passwordPolicy } from '../../../lib/server';
+import { Users as UsersModel, Rooms } from '@rocket.chat/models';
 import { getLoggedInUser } from '../helpers/getLoggedInUser';
 import { getUserInfo } from '../helpers/getUserInfo';
 import { getPaginationItems } from '../helpers/getPaginationItems';
@@ -358,7 +359,7 @@ API.v1.addRoute(
 			const { offset, count } = await getPaginationItems(this.queryParams);
 			const { sort, query } = await this.parseJsonQuery();
 
-			const { text, type, workspace = 'local' } = query;
+			const { text, type, workspace = 'local', showAllAndOnlyUsers = false } = query;
 
 			if (sort && Object.keys(sort).length > 1) {
 				return API.v1.failure('This method support only one "sort" parameter');
@@ -374,6 +375,7 @@ API.v1.addRoute(
 				sortDirection,
 				offset: Math.max(0, offset),
 				limit: Math.max(0, count),
+				showAllAndOnlyUsers,
 			});
 
 			if (!result) {
@@ -386,6 +388,54 @@ API.v1.addRoute(
 				total: result.total,
 			});
 		},
+	},
+);
+
+API.v1.addRoute(
+	'users-to-invite',
+	{ authRequired: true },
+	{
+		async get() {
+			const { query } = this.parseJsonQuery();
+			const { text, rid } = query;
+			const user = Meteor.user() as IUser | null;
+
+			if (!user) {
+				API.v1.failure('User not found');
+			}
+
+			const room = await Rooms.findOneById(rid);
+
+			if (!room) {
+				API.v1.failure('Room not found');
+			}
+
+			const options = {
+				sort: { name: 1 },
+				projections: {
+					_id: 1,
+					username: 1,
+					name: 1,
+					nickname: 1,
+				}
+			};
+
+			const cursor = await UsersModel.findByActiveUsersExcept(
+				text,
+				room.t === 'd' ? room?.usernames || [] : [user.username],
+				options,
+				['username', 'name'],
+				[{
+					type: 'user'
+				}]
+			);
+
+			const result = await cursor.toArray();
+
+			return API.v1.success({
+				result
+			})
+		}
 	},
 );
 

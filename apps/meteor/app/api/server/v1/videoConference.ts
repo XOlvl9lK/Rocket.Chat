@@ -61,9 +61,9 @@ API.v1.addRoute(
 				return API.v1.failure('invalid-params');
 			}
 
-			if (!(await canAccessRoomIdAsync(call.rid, userId))) {
-				return API.v1.failure('invalid-params');
-			}
+			// if (!(await canAccessRoomIdAsync(call.rid, userId))) {
+			// 	return API.v1.failure('invalid-params');
+			// }
 
 			let url: string | undefined;
 
@@ -126,9 +126,9 @@ API.v1.addRoute(
 				return API.v1.failure('invalid-params');
 			}
 
-			if (!userId || !(await canAccessRoomIdAsync(call.rid, userId))) {
-				return API.v1.failure('invalid-params');
-			}
+			// if (!userId || !(await canAccessRoomIdAsync(call.rid, userId))) {
+			// 	return API.v1.failure('invalid-params');
+			// }
 
 			const capabilities = await VideoConf.listProviderCapabilities(call.providerName);
 
@@ -183,4 +183,23 @@ API.v1.addRoute(
 			return API.v1.success(data);
 		},
 	},
+);
+
+API.v1.addRoute(
+	'video-conference.invite',
+	{ authRequired: true, rateLimiterOptions: { numRequestsAllowed: 3, intervalTimeInMS: 1000 } },
+	{
+		async post() {
+			const { callId, invited } = this.bodyParams as { callId: string, invited: string[] };
+			const { userId } = this
+
+			if (!userId) {
+				return API.v1.failure('invalid-params');
+			}
+
+			await VideoConf.invite(userId, callId, invited)
+
+			return API.v1.success();
+		}
+	}
 );

@@ -6,12 +6,14 @@ import type { VideoConfStartProps } from './VideoConfStartProps';
 import type { VideoConfJoinProps } from './VideoConfJoinProps';
 import type { VideoConfCancelProps } from './VideoConfCancelProps';
 import type { PaginatedResult } from '../../helpers/PaginatedResult';
+import type { VideoConfInviteProps } from './VideoConfInviteProps';
 
 export * from './VideoConfInfoProps';
 export * from './VideoConfListProps';
 export * from './VideoConfStartProps';
 export * from './VideoConfJoinProps';
 export * from './VideoConfCancelProps';
+export * from './VideoConfInviteProps';
 
 export type VideoConferenceEndpoints = {
 	'/v1/video-conference.start': {
@@ -41,4 +43,8 @@ export type VideoConferenceEndpoints = {
 	'/v1/video-conference.providers': {
 		GET: () => { data: { key: string; label: string }[] };
 	};
+
+	'/v1/video-conference.invite': {
+		POST: (params: VideoConfInviteProps) => void
+	}
 };

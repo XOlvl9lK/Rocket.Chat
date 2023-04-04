@@ -409,6 +409,32 @@ export class VideoConfService extends ServiceClassInternal implements IVideoConf
 
 		return true;
 	}
+// findOneDirectRoomContainingAllUserIDs
+	public async invite(callerId: IUser['_id'], callId: string, invited: string[]) {
+		const rooms = await Promise.all(invited.map(uid => Rooms.findOneDirectRoomContainingAllUserIDs([callerId, uid])));
+
+		if (!rooms.length) {
+			throw new Error('invalid-room');
+		}
+
+		const user = await Users.findOneById(callerId);
+		if (!user) {
+			throw new Error('failed-to-load-own-data');
+		}
+
+		const call = await VideoConferenceModel.findOneById(callId);
+
+		const record = {
+			t: 'videoconf',
+			msg: '',
+			groupable: false,
+			blocks: [this.buildVideoConfBlock(call._id)],
+		}
+
+		for (let room of rooms) {
+			sendMessage(user, record, room, false)
+		}
+	}
 
 	private notifyUser(
 		userId: IUser['_id'],

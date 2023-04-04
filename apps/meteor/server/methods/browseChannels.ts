@@ -183,6 +183,7 @@ const findUsers = async ({
 	pagination,
 	workspace,
 	viewFullOtherUserInfo,
+	showAllAndOnlyUsers,
 }: {
 	text: string;
 	sort: Record<string, number>;
@@ -192,12 +193,13 @@ const findUsers = async ({
 	};
 	workspace: string;
 	viewFullOtherUserInfo: boolean;
+	showAllAndOnlyUsers: boolean;
 }) => {
 	const searchFields =
 		workspace === 'all' ? ['username', 'name', 'emails.address'] : settings.get<string>('Accounts_SearchFields').trim().split(',');
 
 	const options = {
-		...pagination,
+		...(showAllAndOnlyUsers ? {} : pagination),
 		sort,
 		projection: {
 			username: 1,
@@ -254,6 +256,7 @@ const findUsers = async ({
 		options,
 		searchFields,
 		getFederationDomain(),
+		showAllAndOnlyUsers,
 	);
 	const [results, total] = await Promise.all([cursor.toArray(), totalCount]);
 	return {
@@ -271,6 +274,7 @@ const getUsers = async (
 		skip: number;
 		limit: number;
 	},
+	showAllAndOnlyUsers: boolean,
 ) => {
 	if (!user || !(await hasPermissionAsync(user._id, 'view-outside-room')) || !(await hasPermissionAsync(user._id, 'view-d-room'))) {
 		return;
@@ -278,7 +282,7 @@ const getUsers = async (
 
 	const viewFullOtherUserInfo = await hasPermissionAsync(user._id, 'view-full-other-user-info');
 
-	const { total, results } = await findUsers({ text, sort, pagination, workspace, viewFullOtherUserInfo });
+	const { total, results } = await findUsers({ text, sort, pagination, workspace, viewFullOtherUserInfo, showAllAndOnlyUsers });
 
 	// Try to find federated users, when applicable
 	if (isFederationEnabled() && workspace === 'external' && text.indexOf('@') !== -1) {
@@ -320,6 +324,7 @@ declare module '@rocket.chat/ui-contexts' {
 			page?: number;
 			offset?: number;
 			limit?: number;
+			showAllAndOnlyUsers?: boolean;
 		}) => Promise<unknown>;
 	}
 }
@@ -334,6 +339,7 @@ Meteor.methods<ServerMethods>({
 		page = 0,
 		offset = 0,
 		limit = 10,
+		showAllAndOnlyUsers = false
 	}) {
 		const searchTerm = trim(escapeRegExp(text));
 
@@ -375,7 +381,7 @@ Meteor.methods<ServerMethods>({
 			case 'teams':
 				return getTeams(user, searchTerm, sortChannels(sortBy, sortDirection), pagination);
 			case 'users':
-				return getUsers(user, text, workspace, sortUsers(sortBy, sortDirection), pagination);
+				return getUsers(user, text, workspace, sortUsers(sortBy, sortDirection), pagination, showAllAndOnlyUsers);
 			default:
 		}
 	},

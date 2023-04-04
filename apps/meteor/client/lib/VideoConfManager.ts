@@ -364,6 +364,19 @@ export const VideoConfManager = new (class VideoConfManager extends Emitter<Vide
 		this.emit('call/join', { url, callId });
 	}
 
+	public async invite(callId: string, invited: string[]) {
+		const params = {
+			callId,
+			invited
+		}
+		await APIClient.post('/v1/video-conference.invite', params).catch((e) => {
+			debug && console.error(`[VideoConf] Failed to join call ${callId}`);
+			this.emit('invite/error', { error: e?.xht?.responseJSON?.error || 'unknown-error' })
+
+			return Promise.reject(e);
+		})
+	}
+
 	public abortCall(): void {
 		if (!this.currentCallData) {
 			return;

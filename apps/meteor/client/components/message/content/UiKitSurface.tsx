@@ -2,7 +2,8 @@ import { UIKitIncomingInteractionContainerType } from '@rocket.chat/apps-engine/
 import type { IMessage, IRoom } from '@rocket.chat/core-typings';
 import { MessageBlock } from '@rocket.chat/fuselage';
 import { useMutableCallback } from '@rocket.chat/fuselage-hooks';
-import { UiKitComponent, UiKitMessage, kitContext } from '@rocket.chat/fuselage-ui-kit';
+import { UiKitComponent, UiKitMessage, kitContext, messageParser } from '@rocket.chat/fuselage-ui-kit';
+import { useSetModal } from '@rocket.chat/ui-contexts';
 import type { MessageSurfaceLayout } from '@rocket.chat/ui-kit';
 import type { ContextType, ReactElement } from 'react';
 import React from 'react';
@@ -17,6 +18,8 @@ import {
 	useVideoConfSetPreferences,
 } from '../../../contexts/VideoConfContext';
 import { useVideoConfWarning } from '../../../views/room/contextualBar/VideoConference/hooks/useVideoConfWarning';
+import ParsedText from './uikit/ParsedText';
+import InviteToCallModal from '/client/components/message/content/InviteToCallModal';
 import GazzodownText from '../../GazzodownText';
 
 let patched = false;
@@ -42,6 +45,7 @@ const UiKitSurface = ({ mid: _mid, blocks, rid, appId }: UiKitSurfaceProps): Rea
 	const isRinging = useVideoConfIsRinging();
 	const dispatchWarning = useVideoConfWarning();
 	const dispatchPopup = useVideoConfDispatchOutgoing();
+	const setModal = useSetModal();
 
 	const videoConfManager = useVideoConfManager();
 
@@ -73,6 +77,10 @@ const UiKitSurface = ({ mid: _mid, blocks, rid, appId }: UiKitSurfaceProps): Rea
 
 				if (actionId === 'callBack') {
 					return handleOpenVideoConf(blockId);
+				}
+
+				if (actionId === 'invite') {
+					return setModal(<InviteToCallModal roomId={rid} callId={value} onClose={() => setModal(null)} />);
 				}
 			}
 
