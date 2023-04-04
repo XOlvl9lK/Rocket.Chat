@@ -59,6 +59,19 @@ const VideoConferenceBlock = ({
     );
   };
 
+  const inviteHandler: MouseEventHandler<HTMLButtonElement> = (e): void => {
+    action(
+      {
+        blockId: block.blockId || '',
+        appId,
+        actionId: 'invite',
+        value: block.callId || '',
+        viewId,
+      },
+      e
+    )
+  }
+
   const callAgainHandler: MouseEventHandler<HTMLButtonElement> = (e): void => {
     action(
       {
@@ -169,6 +182,9 @@ const VideoConferenceBlock = ({
         <VideoConfMessageFooter>
           <VideoConfMessageButton primary onClick={joinHandler}>
             {t('Join')}
+          </VideoConfMessageButton>
+          <VideoConfMessageButton primary onClick={inviteHandler}>
+            {t('Invite_to_call')}
           </VideoConfMessageButton>
           {Boolean(data.users.length) && (
             <>

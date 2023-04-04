@@ -258,11 +258,12 @@ export class UsersRaw extends BaseRaw {
 		return this.findPaginated(query, options);
 	}
 
-	findPaginatedByActiveLocalUsersExcept(searchTerm, exceptions, options, forcedSearchFields, localDomain) {
+	findPaginatedByActiveLocalUsersExcept(searchTerm, exceptions, options, forcedSearchFields, localDomain, showAllAndOnlyUsers) {
 		const extraQuery = [
 			{
 				$or: [{ federation: { $exists: false } }, { 'federation.origin': localDomain }],
 			},
+			...(showAllAndOnlyUsers ? [{ type: 'user' }] : [])
 		];
 		return this.findPaginatedByActiveUsersExcept(searchTerm, exceptions, options, forcedSearchFields, extraQuery);
 	}
