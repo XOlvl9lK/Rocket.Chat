@@ -15,7 +15,7 @@ const Search: VFC<Omit<HTMLAttributes<HTMLElement>, 'is'>> = (props) => {
 		setSearchOpen(false);
 	});
 
-	useOutsideClick([ref], handleCloseSearch);
+	// useOutsideClick([ref], handleCloseSearch);
 
 	const openSearch = useMutableCallback(() => {
 		setSearchOpen(true);
@@ -23,7 +23,11 @@ const Search: VFC<Omit<HTMLAttributes<HTMLElement>, 'is'>> = (props) => {
 
 	useEffect(() => {
 		const unsubscribe = tinykeys(window, {
-			'$mod+K': (event) => {
+			'$mod+F': (event) => {
+				event.preventDefault();
+				openSearch();
+			},
+			'$mod+А': (event) => {
 				event.preventDefault();
 				openSearch();
 			},
