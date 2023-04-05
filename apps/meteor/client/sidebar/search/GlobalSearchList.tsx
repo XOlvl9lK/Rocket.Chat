@@ -1,13 +1,12 @@
 import React, { forwardRef, Fragment, MouseEventHandler, MutableRefObject, Ref, useEffect, useRef, useState } from 'react';
 import { useAutoFocus, useMergedRefs, useMutableCallback, useUniqueId, useDebouncedValue } from '@rocket.chat/fuselage-hooks';
-import { useUserPreference, useUserSubscriptions, useSetting, useTranslation, useMethod, useUserId, useToastMessageDispatch } from '@rocket.chat/ui-contexts';
+import { useUserPreference, useSetting, useTranslation, useMethod, useUserId, useToastMessageDispatch } from '@rocket.chat/ui-contexts';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 import { Sidebar, TextInput, Box, Icon } from '@rocket.chat/fuselage';
 import { css } from '@rocket.chat/css-in-js';
 import { usePreventDefault } from '/client/sidebar/hooks/usePreventDefault';
 import tinykeys from 'tinykeys';
 import ScrollableContentWrapper from '/client/components/ScrollableContentWrapper';
-import { isMessageNewDay } from '/client/views/room/MessageList/lib/isMessageNewDay';
 import { MessageTypes } from '/app/ui-utils/lib/MessageTypes';
 import SystemMessage from '/client/components/message/variants/SystemMessage';
 import GlobalSearchListProvider from './GlobalSearchListProvider';
@@ -23,9 +22,9 @@ const shortcut = ((): string => {
 		return '';
 	}
 	if (window.navigator.platform.toLowerCase().includes('mac')) {
-		return '(\u2318+K)';
+		return '(\u2318+F)';
 	}
-	return '(\u2303+K)';
+	return '(\u2303+F)';
 })();
 
 const toggleSelectionState = (next: HTMLElement, current: HTMLElement | undefined, input: HTMLElement | undefined): void => {
@@ -169,13 +168,6 @@ const GlobalSearchList = forwardRef(({ onClose }: GlobalSearchListProps, ref) =>
 		});
 	}, [cursorRef, changeSelection, data?.length, onClose, resetCursor]);
 
-	const handleClick: MouseEventHandler<HTMLElement> = (e): void => {
-		if (e.target instanceof Element && [e.target.tagName, e.target.parentElement?.tagName].includes('BUTTON')) {
-			return;
-		}
-		return onClose();
-	};
-
 	return (
 		<Box
 			position='absolute'
@@ -216,7 +208,6 @@ const GlobalSearchList = forwardRef(({ onClose }: GlobalSearchListProps, ref) =>
 				aria-live='polite'
 				aria-atomic='true'
 				aria-busy={isLoading}
-				onClick={handleClick}
 			>
 				{data && (
 					<>
@@ -234,25 +225,9 @@ const GlobalSearchList = forwardRef(({ onClose }: GlobalSearchListProps, ref) =>
 										data={data}
 										components={{ Scroller: ScrollableContentWrapper }}
 										itemContent={(index, message) => {
-											const previous = data[index - 1];
-
-											const newDay = isMessageNewDay(message, previous);
-											// const firstUnread = isMessageFirstUnread(subscription, message, previous);
-											// const showDivider = newDay || firstUnread;
-
 											const system = MessageTypes.isSystemMessage(message);
-
-											// const unread = subscription?.tunread?.includes(message._id) ?? false;
-											// const mention = subscription?.tunreadUser?.includes(message._id) ?? false;
-											// const all = subscription?.tunreadGroup?.includes(message._id) ?? false;
-
 											return (
 												<Fragment key={message._id}>
-													{/*{showDivider && (*/}
-													{/*	<MessageDivider unreadLabel={firstUnread ? t('Unread_Messages').toLowerCase() : undefined}>*/}
-													{/*		{newDay && formatDate(message.ts)}*/}
-													{/*	</MessageDivider>*/}
-													{/*)}*/}
 
 													{system ? (
 														<SystemMessage message={message} showUserAvatar={showUserAvatar} />

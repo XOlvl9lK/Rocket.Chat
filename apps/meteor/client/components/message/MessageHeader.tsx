@@ -77,7 +77,7 @@ const MessageHeader = ({ message }: MessageHeaderProps): ReactElement => {
 			</MessageNameContainer>
 
 			{shouldShowRolesList && <MessageRoles roles={roles} isBot={message.bot} />}
-			<MessageTimestamp title={formatDateAndTime(message.ts)}>{formatTime(message.ts)}</MessageTimestamp>
+			<MessageTimestamp title={formatDateAndTime(message.ts)}>{formatDateAndTime(message.ts)}</MessageTimestamp>
 			{message.private && <MessageStatusPrivateIndicator>{t('Only_you_can_see_this_message')}</MessageStatusPrivateIndicator>}
 			<StatusIndicators message={message} />
 		</FuselageMessageHeader>

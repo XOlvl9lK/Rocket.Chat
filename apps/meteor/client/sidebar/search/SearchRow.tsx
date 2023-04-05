@@ -33,7 +33,6 @@ const SearchRow = ({ message, showUserAvatar, searchText }: RoomMessageProps) =>
 	const messageRef = useRef(null);
 
 	const selecting = useIsSelecting();
-	const toggleSelected = useToggleSelect(message._id);
 	const selected = useIsSelectedMessage(message._id);
 
 	useCountSelected();

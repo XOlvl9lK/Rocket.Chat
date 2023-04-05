@@ -6,7 +6,7 @@ import { UiKitComponent, UiKitMessage, kitContext, messageParser } from '@rocket
 import { useSetModal } from '@rocket.chat/ui-contexts';
 import type { MessageSurfaceLayout } from '@rocket.chat/ui-kit';
 import type { ContextType, ReactElement } from 'react';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { useActionManager } from '../../../contexts/ActionManagerContext';
 import {
@@ -65,7 +65,7 @@ const UiKitSurface = ({ mid: _mid, blocks, rid, appId }: UiKitSurfaceProps): Rea
 	const actionManager = useActionManager();
 
 	// TODO: this structure is attrociously wrong; we should revisit this
-	const context: ContextType<typeof kitContext> = {
+	const context = useMemo(() => ({
 		// @ts-expect-error Property 'mid' does not exist on type 'ActionParams'.
 		action: ({ actionId, value, blockId, mid = _mid, appId }, event) => {
 			if (appId === 'videoconf-core') {
@@ -100,7 +100,7 @@ const UiKitSurface = ({ mid: _mid, blocks, rid, appId }: UiKitSurfaceProps): Rea
 		// @ts-expect-error Type 'string | boolean | undefined' is not assignable to type 'string'.
 		appId,
 		rid,
-	};
+	}), [setPreferences, joinCall, handleOpenVideoConf, setModal, actionManager, appId, rid, _mid])
 
 	patchMessageParser(); // TODO: this is a hack
 

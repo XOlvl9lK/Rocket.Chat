@@ -15,7 +15,7 @@ import {
   VideoConfMessageAction,
 } from '@rocket.chat/ui-video-conf';
 import type { MouseEventHandler, ReactElement } from 'react';
-import { useContext, memo } from 'react';
+import { useContext, memo, useCallback } from 'react';
 
 import { useSurfaceType } from '../../contexts/SurfaceContext';
 import type { BlockProps } from '../../utils/BlockProps';
@@ -59,7 +59,7 @@ const VideoConferenceBlock = ({
     );
   };
 
-  const inviteHandler: MouseEventHandler<HTMLButtonElement> = (e): void => {
+  const inviteHandler: MouseEventHandler<HTMLButtonElement> = useCallback((e): void => {
     action(
       {
         blockId: block.blockId || '',
@@ -70,9 +70,9 @@ const VideoConferenceBlock = ({
       },
       e
     )
-  }
+  }, []);
 
-  const callAgainHandler: MouseEventHandler<HTMLButtonElement> = (e): void => {
+  const callAgainHandler: MouseEventHandler<HTMLButtonElement> = useCallback((e): void => {
     action(
       {
         blockId: rid || '',
@@ -83,9 +83,9 @@ const VideoConferenceBlock = ({
       },
       e
     );
-  };
+  }, []);
 
-  const openCallInfo: MouseEventHandler<HTMLButtonElement> = (e) => {
+  const openCallInfo: MouseEventHandler<HTMLButtonElement> = useCallback((e) => {
     action(
       {
         blockId: callId,
@@ -96,7 +96,7 @@ const VideoConferenceBlock = ({
       },
       e
     );
-  };
+  }, []);
 
   if (result.isSuccess) {
     const { data } = result;
