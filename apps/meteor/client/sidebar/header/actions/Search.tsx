@@ -8,14 +8,22 @@ import SearchList from '../../search/SearchList';
 import GlobalSearchList from '/client/sidebar/search/GlobalSearchList';
 
 const Search: VFC<Omit<HTMLAttributes<HTMLElement>, 'is'>> = (props) => {
+	const [globalSearchOpen, setGlobalSearchOpen] = useState(false);
 	const [searchOpen, setSearchOpen] = useState(false);
 
 	const ref = useRef<HTMLElement>(null);
+	const handleCloseGlobalSearch = useMutableCallback(() => {
+		setGlobalSearchOpen(false);
+	});
 	const handleCloseSearch = useMutableCallback(() => {
 		setSearchOpen(false);
 	});
 
 	// useOutsideClick([ref], handleCloseSearch);
+
+	const openGlobalSearch = useMutableCallback(() => {
+		setGlobalSearchOpen(true);
+	});
 
 	const openSearch = useMutableCallback(() => {
 		setSearchOpen(true);
@@ -25,13 +33,21 @@ const Search: VFC<Omit<HTMLAttributes<HTMLElement>, 'is'>> = (props) => {
 		const unsubscribe = tinykeys(window, {
 			'$mod+F': (event) => {
 				event.preventDefault();
-				openSearch();
+				openGlobalSearch();
 			},
 			'$mod+А': (event) => {
 				event.preventDefault();
-				openSearch();
+				openGlobalSearch();
 			},
 			'$mod+P': (event) => {
+				event.preventDefault();
+				openGlobalSearch();
+			},
+			'$mod+K': (event) => {
+				event.preventDefault();
+				openSearch();
+			},
+			'$mod+Л': (event) => {
 				event.preventDefault();
 				openSearch();
 			},
@@ -40,12 +56,13 @@ const Search: VFC<Omit<HTMLAttributes<HTMLElement>, 'is'>> = (props) => {
 		return (): void => {
 			unsubscribe();
 		};
-	}, [openSearch]);
+	}, [openGlobalSearch]);
 
 	return (
 		<>
-			<Sidebar.TopBar.Action icon='magnifier' onClick={openSearch} {...props} />
-			{searchOpen && <GlobalSearchList ref={ref} onClose={handleCloseSearch} />}
+			<Sidebar.TopBar.Action icon='magnifier' onClick={openGlobalSearch} {...props} />
+			{globalSearchOpen && <GlobalSearchList ref={ref} onClose={handleCloseGlobalSearch} />}
+			{searchOpen && <SearchList ref={ref} onClose={handleCloseSearch} />}
 		</>
 	);
 };
