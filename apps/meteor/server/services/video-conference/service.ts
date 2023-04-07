@@ -432,7 +432,14 @@ export class VideoConfService extends ServiceClassInternal implements IVideoConf
 		}
 
 		for (let room of rooms) {
-			sendMessage(user, record, room, false)
+			const message = sendMessage(user, record, room, false)
+
+			const threadRecord = {
+				msg: `Ссылка на звонок: ${call.url}`,
+				tmid: message._id,
+				groupable: false,
+			}
+			sendMessage(user, threadRecord, room, false)
 		}
 	}
 
@@ -517,6 +524,8 @@ export class VideoConfService extends ServiceClassInternal implements IVideoConf
 			msg: '',
 			groupable: false,
 			blocks: customBlocks || [this.buildVideoConfBlock(call._id)],
+			tcount: 1,
+			replies: [createdBy._id]
 		};
 
 		const room = await Rooms.findOneById(call.rid);
@@ -524,6 +533,15 @@ export class VideoConfService extends ServiceClassInternal implements IVideoConf
 		const user = createdBy || (appId && (await Users.findOneByAppId(appId))) || (await Users.findOneById('rocket.cat'));
 
 		const message = await sendMessage(user, record, room, false);
+
+		const threadRecord = {
+			msg: `Ссылка на звонок: ${call.url}`,
+			tmid: message._id,
+			groupable: false,
+		}
+
+		await sendMessage(user, threadRecord, room, false)
+
 		return message._id;
 	}
 
