@@ -14,7 +14,7 @@ import {
 import { useTranslation, useUserPreference, useLayout } from '@rocket.chat/ui-contexts';
 import { useMutation } from '@tanstack/react-query';
 import type { MouseEventHandler, ReactElement, FormEvent, KeyboardEventHandler, KeyboardEvent, Ref, ClipboardEventHandler } from 'react';
-import React, { memo, useRef, useReducer, useCallback } from 'react';
+import React, { memo, useRef, useReducer, useCallback, useState, useRef } from 'react';
 import { useSubscription } from 'use-subscription';
 
 import { EmojiPicker } from '../../../../../../../app/emoji/client';
@@ -41,6 +41,7 @@ import MessageBoxActionsToolbar from './MessageBoxActionsToolbar';
 import MessageBoxFormattingToolbar from './MessageBoxFormattingToolbar';
 import MessageBoxReplies from './MessageBoxReplies';
 import { useMessageBoxAutoFocus } from './hooks/useMessageBoxAutoFocus';
+import { MessageEditor, EditorManager } from './MessageEditor';
 
 const reducer = (_: unknown, event: FormEvent<HTMLInputElement>): boolean => {
 	const target = event.target as HTMLInputElement;
@@ -81,7 +82,7 @@ type MessageBoxProps = {
 	rid: IRoom['_id'];
 	tmid?: IMessage['_id'];
 	readOnly: boolean;
-	onSend?: (params: { value: string; tshow?: boolean }) => Promise<void>;
+	onSend?: (params: { value: string; tshow?: boolean, isEditor }) => Promise<void>;
 	onJoin?: () => Promise<void>;
 	onResize?: () => void;
 	onTyping?: () => void;
@@ -109,6 +110,8 @@ const MessageBox = ({
 	tshow,
 }: MessageBoxProps): ReactElement => {
 	const [typing, setTyping] = useReducer(reducer, false);
+	const [isEditor, setIsEditor] = useState(false);
+	const editorManager = useRef<EditorManager | null>(null)
 
 	const { isMobile } = useLayout();
 	const sendOnEnterBehavior = useUserPreference<'normal' | 'alternative' | 'desktop'>('sendOnEnter') || isMobile;
@@ -159,13 +162,29 @@ const MessageBox = ({
 	});
 
 	const handleSendMessage = useMutableCallback(() => {
-		const text = chat?.composer?.text ?? '';
-		chat?.composer?.clear();
+		if (isEditor) {
+			if (!editorManager.current?.isEmpty(true)) {
+				const text = editorManager.current?.getContent()
+				chat?.composer?.clear();
 
-		onSend?.({
-			value: text,
-			tshow,
-		});
+				onSend?.({
+					value: text,
+					tshow,
+					isEditor: true
+				}).then(() => {
+					editorManager.current?.clear()
+					setIsEditor(false)
+				})
+			}
+		} else {
+			const text = chat?.composer?.text ?? '';
+			chat?.composer?.clear();
+
+			onSend?.({
+				value: text,
+				tshow,
+			});
+		}
 	});
 
 	const handler: KeyboardEventHandler<HTMLTextAreaElement> = useMutableCallback((event) => {
@@ -341,6 +360,10 @@ const MessageBox = ({
 
 	const mergedRefs = useMessageComposerMergedRefs(c, textareaRef, callbackRef, autofocusRef);
 
+	const toggleEditor = useCallback(() => {
+		setIsEditor(prev => !prev)
+	}, [])
+
 	return (
 		<>
 			{chat?.composer?.quotedMessages && <MessageBoxReplies />}
@@ -378,45 +401,59 @@ const MessageBox = ({
 			{isRecordingVideo && <VideoMessageRecorder reference={messageComposerRef} rid={rid} tmid={tmid} />}
 			<MessageComposer ref={messageComposerRef} variant={isEditing ? 'editing' : undefined}>
 				{isRecordingAudio && <AudioMessageRecorder rid={rid} isMicrophoneDenied={isMicrophoneDenied} />}
-				<MessageComposerInput
-					ref={mergedRefs as unknown as Ref<HTMLInputElement>}
-					aria-label={t('Message')}
-					name='msg'
-					disabled={isRecording || !canSend}
-					onChange={setTyping}
-					style={textAreaStyle}
-					placeholder={t('Message')}
-					onKeyDown={handler}
-					onPaste={handlePaste}
-					aria-activedescendant={ariaActiveDescendant}
-				/>
+				{isEditor ?
+					<MessageEditor ref={editorManager} />
+					:
+					<MessageComposerInput
+						ref={mergedRefs as unknown as Ref<HTMLInputElement>}
+						aria-label={t('Message')}
+						name='msg'
+						disabled={isRecording || !canSend}
+						onChange={setTyping}
+						style={textAreaStyle}
+						placeholder={t('Message')}
+						onKeyDown={handler}
+						onPaste={handlePaste}
+						aria-activedescendant={ariaActiveDescendant}
+					/>
+				}
 				<div ref={shadowRef} style={shadowStyle} />
 				<MessageComposerToolbar>
 					<MessageComposerToolbarActions aria-label={t('Message_composer_toolbox_primary_actions')}>
+						{!isEditor &&
+							<>
+								<MessageComposerAction
+									icon='emoji'
+									disabled={!useEmojis || isRecording || !canSend}
+									onClick={handleOpenEmojiPicker}
+									title={t('Emoji')}
+								/>
+								<MessageComposerActionsDivider />
+								{chat.composer && formatters.length > 0 && (
+									<MessageBoxFormattingToolbar
+										composer={chat.composer}
+										variant={sizes.inlineSize < 480 ? 'small' : 'large'}
+										items={formatters}
+										disabled={isRecording || !canSend}
+									/>
+								)}
+								<MessageComposerActionsDivider />
+								<MessageBoxActionsToolbar
+									variant={sizes.inlineSize < 480 ? 'small' : 'large'}
+									isRecording={isRecording}
+									typing={typing}
+									canSend={canSend}
+									rid={rid}
+									tmid={tmid}
+									isMicrophoneDenied={isMicrophoneDenied}
+								/>
+								<MessageComposerActionsDivider />
+							</>
+						}
 						<MessageComposerAction
-							icon='emoji'
-							disabled={!useEmojis || isRecording || !canSend}
-							onClick={handleOpenEmojiPicker}
-							title={t('Emoji')}
-						/>
-						<MessageComposerActionsDivider />
-						{chat.composer && formatters.length > 0 && (
-							<MessageBoxFormattingToolbar
-								composer={chat.composer}
-								variant={sizes.inlineSize < 480 ? 'small' : 'large'}
-								items={formatters}
-								disabled={isRecording || !canSend}
-							/>
-						)}
-						<MessageComposerActionsDivider />
-						<MessageBoxActionsToolbar
-							variant={sizes.inlineSize < 480 ? 'small' : 'large'}
-							isRecording={isRecording}
-							typing={typing}
-							canSend={canSend}
-							rid={rid}
-							tmid={tmid}
-							isMicrophoneDenied={isMicrophoneDenied}
+							icon='arrow-expand'
+							onClick={toggleEditor}
+							title={t('Editor')}
 						/>
 					</MessageComposerToolbarActions>
 					<MessageComposerToolbarSubmit>
@@ -429,7 +466,7 @@ const MessageBox = ({
 							<MessageComposerAction
 								aria-label={t('Send')}
 								icon='send'
-								disabled={!canSend || (!typing && !isEditing)}
+								disabled={isEditor ? false : !canSend || (!typing && !isEditing)}
 								onClick={handleSendMessage}
 								secondary={typing || isEditing}
 								info={typing || isEditing}

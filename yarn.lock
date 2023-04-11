@@ -6935,6 +6935,7 @@ __metadata:
     "@testing-library/react": ~12.1.5
     "@testing-library/react-hooks": ^8.0.1
     "@testing-library/user-event": ~13.5.0
+    "@tinymce/tinymce-react": ^4.3.0
     "@types/adm-zip": ^0.5.0
     "@types/archiver": ^5.3.1
     "@types/bad-words": ^3.0.1
@@ -6991,6 +6992,7 @@ __metadata:
     "@types/psl": ^1.1.0
     "@types/react": ~17.0.57
     "@types/react-dom": ~17.0.17
+    "@types/react-html-parser": ^2.0.2
     "@types/rewire": ^2.5.28
     "@types/sanitize-html": ^2
     "@types/semver": ^7.3.10
@@ -7161,6 +7163,7 @@ __metadata:
     react-dom: ~17.0.2
     react-error-boundary: ^3.1.4
     react-hook-form: ^7.30.0
+    react-html-parser: ^2.0.2
     react-i18next: ^11.16.7
     react-keyed-flatten-children: ^1.3.0
     react-virtuoso: ^1.11.1
@@ -7185,6 +7188,7 @@ __metadata:
     template-file: ^6.0.1
     textarea-caret: ^3.1.0
     tinykeys: ^1.4.0
+    tinymce: ^5
     ts-node: ^10.9.1
     turndown: ^7.1.1
     twilio: ^3.76.1
@@ -9955,6 +9959,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tinymce/tinymce-react@npm:^4.3.0":
+  version: 4.3.0
+  resolution: "@tinymce/tinymce-react@npm:4.3.0"
+  dependencies:
+    prop-types: ^15.6.2
+    tinymce: ^6.3.1
+  peerDependencies:
+    react: ^18.0.0 || ^17.0.1 || ^16.7.0
+    react-dom: ^18.0.0 || ^17.0.1 || ^16.7.0
+  checksum: 73b3765ae9bacc58df760c1bb8968fc6c8dd498373a8f99f782292f0c3bbc4c1ff71d6aaa1d8ac66349a79ebfc6091698c2891532c3efd8f795399b59bb427b8
+  languageName: node
+  linkType: hard
+
 "@tokenizer/token@npm:^0.3.0":
   version: 0.3.0
   resolution: "@tokenizer/token@npm:0.3.0"
@@ -10411,6 +10428,17 @@ __metadata:
   version: 6.1.0
   resolution: "@types/html-minifier-terser@npm:6.1.0"
   checksum: eb843f6a8d662d44fb18ec61041117734c6aae77aa38df1be3b4712e8e50ffaa35f1e1c92fdd0fde14a5675fecf457abcd0d15a01fae7506c91926176967f452
+  languageName: node
+  linkType: hard
+
+"@types/htmlparser2@npm:*":
+  version: 3.10.3
+  resolution: "@types/htmlparser2@npm:3.10.3"
+  dependencies:
+    "@types/domutils": "*"
+    "@types/node": "*"
+    domhandler: ^2.4.0
+  checksum: 1b0009625fd09237439b3f9bb798f4c2544e9fda61e2b6c5546bf7d2f97d389924762e16d2913d5ab93e0d97ceb288d8b5dd234813506e4a390a2ab04eeafcca
   languageName: node
   linkType: hard
 
@@ -10954,7 +10982,37 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:*, @types/react@npm:^17, @types/react@npm:~17.0.57":
+"@types/react-dom@npm:^18.0.0":
+  version: 18.0.6
+  resolution: "@types/react-dom@npm:18.0.6"
+  dependencies:
+    "@types/react": "*"
+  checksum: db571047af1a567631758700b9f7d143e566df939cfe5fbf7535347cc0c726a1cdbb5e3f8566d076e54cf708b6c1166689de194a9ba09ee35efc9e1d45911685
+  languageName: node
+  linkType: hard
+
+"@types/react-html-parser@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "@types/react-html-parser@npm:2.0.2"
+  dependencies:
+    "@types/htmlparser2": "*"
+    "@types/react": "*"
+  checksum: bff764fa8dda726ac17571d307f3cdeffca8ddef7fb7575fbb65a52f9555bcd10d51eb18647741e2c217e7ccb7a5345986808a88a9300fa0fbb3dc05b83534e3
+  languageName: node
+  linkType: hard
+
+"@types/react@npm:*, @types/react@npm:^17":
+  version: 17.0.52
+  resolution: "@types/react@npm:17.0.52"
+  dependencies:
+    "@types/prop-types": "*"
+    "@types/scheduler": "*"
+    csstype: ^3.0.2
+  checksum: a51b98dd87838d161278fdf9dd78e6a4ff8c018f406d6647f77963e144fb52a8beee40c89fd0e7e840eaeaa8bd9fe2f34519410540b1a52d43a6f8b4d2fbce33
+  languageName: node
+  linkType: hard
+
+"@types/react@npm:~17.0.57":
   version: 17.0.58
   resolution: "@types/react@npm:17.0.58"
   dependencies:
@@ -17281,7 +17339,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"domelementtype@npm:1":
+"domelementtype@npm:1, domelementtype@npm:^1.3.1":
   version: 1.3.1
   resolution: "domelementtype@npm:1.3.1"
   checksum: 7893da40218ae2106ec6ffc146b17f203487a52f5228b032ea7aa470e41dfe03e1bd762d0ee0139e792195efda765434b04b43cddcf63207b098f6ae44b36ad6
@@ -17310,6 +17368,15 @@ __metadata:
   dependencies:
     webidl-conversions: ^7.0.0
   checksum: ddbc1268edf33a8ba02ccc596735ede80375ee0cf124b30d2f05df5b464ba78ef4f49889b6391df4a04954e63d42d5631c7fcf8b1c4f12bc531252977a5f13d5
+  languageName: node
+  linkType: hard
+
+"domhandler@npm:^2.3.0, domhandler@npm:^2.4.0":
+  version: 2.4.2
+  resolution: "domhandler@npm:2.4.2"
+  dependencies:
+    domelementtype: 1
+  checksum: 49bd70c9c784f845cd047e1dfb3611bd10891c05719acfc93f01fc726a419ed09fbe0b69f9064392d556a63fffc5a02010856cedae9368f4817146d95a97011f
   languageName: node
   linkType: hard
 
@@ -17352,7 +17419,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"domutils@npm:^1.7.0":
+"domutils@npm:^1.5.1, domutils@npm:^1.7.0":
   version: 1.7.0
   resolution: "domutils@npm:1.7.0"
   dependencies:
@@ -17759,6 +17826,13 @@ __metadata:
   version: 2.2.0
   resolution: "ent@npm:2.2.0"
   checksum: f588b5707d6fef36011ea10d530645912a69530a1eb0831f8708c498ac028363a7009f45cfadd28ceb4dafd9ac17ec15213f88d09ce239cd033cfe1328dd7d7d
+  languageName: node
+  linkType: hard
+
+"entities@npm:^1.1.1":
+  version: 1.1.2
+  resolution: "entities@npm:1.1.2"
+  checksum: d537b02799bdd4784ffd714d000597ed168727bddf4885da887c5a491d735739029a00794f1998abbf35f3f6aeda32ef5c15010dca1817d401903a501b6d3e05
   languageName: node
   linkType: hard
 
@@ -21391,6 +21465,20 @@ __metadata:
   version: 0.0.4
   resolution: "htmlencode@npm:0.0.4"
   checksum: b5c5a280213569f59807d22ae2d68c77360f6337b6936cdfa4e2aeaa12e3a69bb36b426ad18ed9333a7fb3f7d55c14ea3b46040d3271af7a586f262aaf4092ad
+  languageName: node
+  linkType: hard
+
+"htmlparser2@npm:^3.9.0":
+  version: 3.10.1
+  resolution: "htmlparser2@npm:3.10.1"
+  dependencies:
+    domelementtype: ^1.3.1
+    domhandler: ^2.3.0
+    domutils: ^1.5.1
+    entities: ^1.1.1
+    inherits: ^2.0.1
+    readable-stream: ^3.1.1
+  checksum: 6875f7dd875aa10be17d9b130e3738cd8ed4010b1f2edaf4442c82dfafe9d9336b155870dcc39f38843cbf7fef5e4fcfdf0c4c1fd4db3a1b91a1e0ee8f6c3475
   languageName: node
   linkType: hard
 
@@ -30740,6 +30828,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-html-parser@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "react-html-parser@npm:2.0.2"
+  dependencies:
+    htmlparser2: ^3.9.0
+  peerDependencies:
+    react: ^0.14.0 || ^15.0.0 || ^16.0.0-0
+  checksum: 2e6bf4cd90b07667de5771eec7738155c3df39114b28df4a117722b17412015aa9115fd2cb76ca959fd364909de70ebc6032f13ae0fec16d888c792fbaa2226c
+  languageName: node
+  linkType: hard
+
 "react-i18next@npm:^11.16.7, react-i18next@npm:^11.16.9":
   version: 11.18.5
   resolution: "react-i18next@npm:11.18.5"
@@ -34573,6 +34672,20 @@ __metadata:
   version: 1.4.0
   resolution: "tinykeys@npm:1.4.0"
   checksum: 1a285204116f1150d761a5c34bac9340e9c66a2b1a619311c3e0581168bc086a0ba9ae844774b82cb3393a121def5738c1f33f426135052d5acbf7863e9268d2
+  languageName: node
+  linkType: hard
+
+"tinymce@npm:^5":
+  version: 5.10.7
+  resolution: "tinymce@npm:5.10.7"
+  checksum: fe471f1004a29523d5ac39fc5023c2aa30efee653366dfd1c3c6649be2178bd04f87985c9cec00662465cd623a4f3572734ee1009c4edcf0f5af339dd7a544ad
+  languageName: node
+  linkType: hard
+
+"tinymce@npm:^6.3.1":
+  version: 6.4.1
+  resolution: "tinymce@npm:6.4.1"
+  checksum: 2d0108b42413ab1c970c551b71cedd9dea0d75ebf27962e5fc0803f4c75fbeb785560a608b32bc8be8f187368d3a8b70017762734044eff2f4b928867e89a3b0
   languageName: node
   linkType: hard
 

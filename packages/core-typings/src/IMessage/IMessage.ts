@@ -101,6 +101,7 @@ export type MessageTypesValues =
 	| 'new-leader'
 	| 'leader-removed'
 	| 'discussion-created'
+	| 'editor'
 	| LivechatMessageTypes
 	| TeamMessageTypes
 	| VoipMessageTypesValues

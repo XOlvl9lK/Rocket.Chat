@@ -2,15 +2,18 @@ import { css } from '@rocket.chat/css-in-js';
 import { MessageBody, Box, Palette } from '@rocket.chat/fuselage';
 import { Markup } from '@rocket.chat/gazzodown';
 import React from 'react';
+import HtmlParser from 'react-html-parser';
 
 import type { MessageWithMdEnforced } from '../../lib/parseMessageTextToAstMarkdown';
 import GazzodownText from '../GazzodownText';
 
 type MessageContentBodyProps = Pick<MessageWithMdEnforced, 'mentions' | 'channels' | 'md'> & {
 	searchText?: string;
+	isEditor?: boolean
+	msg?: string
 };
 
-const MessageContentBody = ({ mentions, channels, md, searchText }: MessageContentBodyProps) => {
+const MessageContentBody = ({ mentions, channels, md, searchText, isEditor, msg }: MessageContentBodyProps) => {
 	// TODO: this style should go to Fuselage <MessageBody> repository
 	const messageBodyAdditionalStyles = css`
 		> blockquote {
@@ -55,9 +58,13 @@ const MessageContentBody = ({ mentions, channels, md, searchText }: MessageConte
 	return (
 		<MessageBody data-qa-type='message-body'>
 			<Box className={messageBodyAdditionalStyles}>
-				<GazzodownText channels={channels} mentions={mentions} searchText={searchText}>
-					<Markup tokens={md} />
-				</GazzodownText>
+				{isEditor ?
+					HtmlParser(msg || '')
+					:
+					<GazzodownText channels={channels} mentions={mentions} searchText={searchText}>
+						<Markup tokens={md} />
+					</GazzodownText>
+				}
 			</Box>
 		</MessageBody>
 	);

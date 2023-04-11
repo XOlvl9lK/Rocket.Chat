@@ -13,16 +13,12 @@ type InviteToCallModalProps = {
 }
 
 const useLoadUsersToInvite = (roomId: string) => {
-	const getDirectoryData = useEndpoint('GET', '/v1/users-to-invite');
-	const [search, setSearch] = useState('')
-
-	const debouncedSearch = useDebouncedValue(search, 500)
+	const getUsersToInvite = useEndpoint('GET', '/v1/users-to-invite');
 
 	const { data } = useQuery(
-		['usersToInvite', debouncedSearch],
-		() => getDirectoryData({
+		['usersToInvite'],
+		() => getUsersToInvite({
 			query: JSON.stringify({
-				text: debouncedSearch,
 				rid: roomId
 			}),
 		}),
@@ -33,29 +29,28 @@ const useLoadUsersToInvite = (roomId: string) => {
 
 	return {
 		data,
-		search,
-		setSearch,
 	}
 }
 
 const InviteToCallModal = ({ callId, onClose, roomId }: InviteToCallModalProps) => {
 	const t = useTranslation();
 	const [invited, setInvited] = useState<string[]>([])
+	const [isInvitingInProgress, setIsInvitingInProgress] = useState(false)
 
 	const {
-		search,
-		setSearch,
 		data,
 	} = useLoadUsersToInvite(roomId)
 
 	const onInviteUsers = useCallback(() => {
 		if (invited?.length) {
+			setIsInvitingInProgress(true)
 			VideoConfManager.invite(callId, invited)
 				.then(() => {
 					setInvited([])
 					onClose()
 					dispatchToastMessage({ type: 'success', message: t('Invitations_sent') })
 				})
+				.finally(() => setIsInvitingInProgress(false))
 		}
 	}, [invited])
 
@@ -70,16 +65,14 @@ const InviteToCallModal = ({ callId, onClose, roomId }: InviteToCallModalProps) 
 						<MultiSelectFiltered
 							options={Array.isArray(data?.result) ? data?.result?.map(user => [user._id, user.username]) : []}
 							onChange={(values) => setInvited(values)}
-							filter={search}
-							setFilter={setSearch}
 						/>
 					</Field.Row>
 				</Field>
 			</Modal.Content>
 			<Modal.Footer>
 				<Modal.FooterControllers>
-					<Button onClick={onInviteUsers}>{t('Ok')}</Button>
-					<Button onClick={onClose}>{t('Cancel')}</Button>
+					<Button disabled={isInvitingInProgress} onClick={onInviteUsers}>{t('Ok')}</Button>
+					<Button disabled={isInvitingInProgress} onClick={onClose}>{t('Cancel')}</Button>
 				</Modal.FooterControllers>
 			</Modal.Footer>
 		</Modal>

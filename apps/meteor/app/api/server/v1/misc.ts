@@ -16,7 +16,6 @@ import {
 	validateParamsPwGetPolicyRest,
 } from '@rocket.chat/rest-typings';
 import type { IUser } from '@rocket.chat/core-typings';
-import { Users as UsersRaw } from '@rocket.chat/models';
 
 import { hasPermissionAsync } from '../../../authorization/server/functions/hasPermission';
 import { settings } from '../../../settings/server';
@@ -26,7 +25,7 @@ import { getURL } from '../../../utils/lib/getURL';
 import { getLogs } from '../../../../server/stream/stdout';
 import { SystemLogger } from '../../../../server/lib/logger/system';
 import { passwordPolicy } from '../../../lib/server';
-import { Users as UsersModel, Rooms } from '@rocket.chat/models';
+import { Users, Rooms } from '@rocket.chat/models';
 import { getLoggedInUser } from '../helpers/getLoggedInUser';
 import { getUserInfo } from '../helpers/getUserInfo';
 import { getPaginationItems } from '../helpers/getPaginationItems';
@@ -358,7 +357,7 @@ API.v1.addRoute(
 		async get() {
 			const { offset, count } = await getPaginationItems(this.queryParams);
 			const { sort, query } = await this.parseJsonQuery();
-
+			console.log('query', query);
 			const { text, type, workspace = 'local', showAllAndOnlyUsers = false } = query;
 
 			if (sort && Object.keys(sort).length > 1) {
@@ -393,11 +392,11 @@ API.v1.addRoute(
 
 API.v1.addRoute(
 	'users-to-invite',
-	{ authRequired: true },
+	{ authRequired: true, validateParams: true },
 	{
 		async get() {
-			const { query } = this.parseJsonQuery();
-			const { text, rid } = query;
+			const { query } = await this.parseJsonQuery();
+			const { rid } = query;
 			const user = Meteor.user() as IUser | null;
 
 			if (!user) {
@@ -420,8 +419,8 @@ API.v1.addRoute(
 				}
 			};
 
-			const cursor = await UsersModel.findByActiveUsersExcept(
-				text,
+			const cursor = await Users.findByActiveUsersExcept(
+				'',
 				room.t === 'd' ? room?.usernames || [] : [user.username],
 				options,
 				['username', 'name'],

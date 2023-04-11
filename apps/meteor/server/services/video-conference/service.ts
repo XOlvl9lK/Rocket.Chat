@@ -409,7 +409,7 @@ export class VideoConfService extends ServiceClassInternal implements IVideoConf
 
 		return true;
 	}
-// findOneDirectRoomContainingAllUserIDs
+
 	public async invite(callerId: IUser['_id'], callId: string, invited: string[]) {
 		const rooms = await Promise.all(invited.map(uid => Rooms.findOneDirectRoomContainingAllUserIDs([callerId, uid])));
 
@@ -432,14 +432,14 @@ export class VideoConfService extends ServiceClassInternal implements IVideoConf
 		}
 
 		for (let room of rooms) {
-			const message = sendMessage(user, record, room, false)
+			const message = await sendMessage(user, record, room, false)
 
 			const threadRecord = {
 				msg: `Ссылка на звонок: ${call.url}`,
 				tmid: message._id,
 				groupable: false,
 			}
-			sendMessage(user, threadRecord, room, false)
+			await sendMessage(user, threadRecord, room, false)
 		}
 	}
 

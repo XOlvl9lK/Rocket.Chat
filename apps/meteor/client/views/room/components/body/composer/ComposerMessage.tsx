@@ -39,12 +39,13 @@ const ComposerMessage = ({ rid, tmid, readOnly, onSend, ...props }: ComposerMess
 				}
 			},
 
-			onSend: async ({ value: text, tshow }: { value: string; tshow?: boolean }): Promise<void> => {
+			onSend: async ({ value: text, tshow, isEditor }: { value: string; tshow?: boolean, isEditor?: boolean }): Promise<void> => {
 				try {
 					await chat?.action.stop('typing');
 					const newMessageSent = await chat?.flows.sendMessage({
 						text,
 						tshow,
+						isEditor,
 					});
 					if (newMessageSent) onSend?.();
 				} catch (error) {
