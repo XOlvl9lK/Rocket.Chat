@@ -17,6 +17,7 @@ import { UserAction } from './UserAction';
 import { replyBroadcast } from '../../../../client/lib/chats/flows/replyBroadcast';
 import { createDataAPI } from '../../../../client/lib/chats/data';
 import { createUploadsAPI } from '../../../../client/lib/chats/uploads';
+import { EditorManager } from '/client/views/room/components/body/composer/messageBox/MessageEditor';
 
 type DeepWritable<T> = T extends (...args: any) => any
 	? T
@@ -26,11 +27,16 @@ type DeepWritable<T> = T extends (...args: any) => any
 
 export class ChatMessages implements ChatAPI {
 	public composer: ComposerAPI | undefined;
+	public editorManager: { openEditor: () => void, setContent: (content: string) => void } | undefined
 
 	public setComposerAPI = (composer: ComposerAPI): void => {
 		this.composer?.release();
 		this.composer = composer;
 	};
+
+	public setEditorManager(manager: { openEditor: () => void, setContent: (content: string) => void } | undefined) {
+		this.editorManager = manager
+	}
 
 	public data: DataAPI;
 
@@ -99,12 +105,19 @@ export class ChatMessages implements ChatAPI {
 
 			this.currentEditingMID = message._id;
 			setHighlightMessage(message._id);
-			this.composer.setEditingMode(true);
 
-			this.composer.setText(text);
-			cursorAtStart && this.composer.setCursorToStart();
-			!cursorAtStart && this.composer.setCursorToEnd();
-			this.composer.focus();
+			if (message?.t === 'editor') {
+				console.log('this.editorManager', this.editorManager);
+				this.editorManager?.setContent?.(text)
+				this.editorManager?.openEditor()
+			} else {
+				this.composer.setEditingMode(true);
+
+				this.composer.setText(text);
+				cursorAtStart && this.composer.setCursorToStart();
+				!cursorAtStart && this.composer.setCursorToEnd();
+				this.composer.focus();
+			}
 		},
 	};
 

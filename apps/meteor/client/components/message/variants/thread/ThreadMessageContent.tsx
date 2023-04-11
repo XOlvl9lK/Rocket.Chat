@@ -42,7 +42,13 @@ const ThreadMessageContent = ({ message }: ThreadMessageContentProps): ReactElem
 			{!normalizedMessage.blocks?.length && !!normalizedMessage.md?.length && (
 				<>
 					{(!encrypted || normalizedMessage.e2e === 'done') && (
-						<MessageContentBody md={normalizedMessage.md} mentions={normalizedMessage.mentions} channels={normalizedMessage.channels} />
+						<MessageContentBody
+							md={normalizedMessage.md}
+							mentions={normalizedMessage.mentions}
+							channels={normalizedMessage.channels}
+							isEditor={message?.t === 'editor'}
+							msg={message.msg}
+						/>
 					)}
 					{encrypted && normalizedMessage.e2e === 'pending' && t('E2E_message_encrypted_placeholder')}
 				</>

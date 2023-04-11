@@ -4,6 +4,7 @@ import type { UIEvent } from 'react';
 import type { FormattingButton } from '../../../app/ui-message/client/messageBox/messageBoxFormatting';
 import type { Subscribable } from '../../definitions/Subscribable';
 import type { Upload } from './Upload';
+import { EditorManager } from '/client/views/room/components/body/composer/messageBox/MessageEditor';
 
 export type ComposerAPI = {
 	release(): void;
@@ -105,7 +106,9 @@ export type UploadsAPI = {
 
 export type ChatAPI = {
 	readonly composer?: ComposerAPI;
+	readonly editorManager: { openEditor: () => void, setContent: (content: string) => void } | undefined
 	readonly setComposerAPI: (composer: ComposerAPI) => void;
+	readonly setEditorManager: (manager: { openEditor: () => void, setContent: (content: string) => void } | undefined) => void;
 	readonly data: DataAPI;
 	readonly uploads: UploadsAPI;
 	readonly messageEditing: {

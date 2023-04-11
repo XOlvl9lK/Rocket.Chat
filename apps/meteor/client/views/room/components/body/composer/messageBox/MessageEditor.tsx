@@ -54,9 +54,14 @@ export type EditorManager = {
 	isEmpty: (notify?: boolean) => boolean
 	getContent: () => string
 	clear: () => void
+	setContent: (content: string) => void
 }
 
-export const MessageEditor = forwardRef(({}, ref) => {
+type MessageEditorProps = {
+	isVisible: boolean
+}
+
+export const MessageEditor = forwardRef(({ isVisible }: MessageEditorProps, ref) => {
 	const editorRef = useRef<any>(null);
 
 	const isEmpty = useCallback((notify?: boolean) => {
@@ -78,12 +83,16 @@ export const MessageEditor = forwardRef(({}, ref) => {
 		editorRef.current?.setContent('')
 	}, [])
 
-	useImperativeHandle(ref, () => ({ isEmpty, getContent, clear }))
+	const setContent = useCallback((content: string) => {
+		editorRef.current?.setContent(content)
+	}, [])
 
-	return <div style={{ width: '100%' }}>
+	useImperativeHandle(ref, () => ({ isEmpty, getContent, clear, setContent }))
+
+	return <div style={{ width: '100%', display: isVisible ? 'block' : 'none' }}>
 		<Editor
 			onInit={(evt, editor) => editorRef.current = editor}
-			initialValue='<p>This is the initial content of the editor.</p>'
+			initialValue=''
 			init={{
 				skin: false,
 				content_css: false,
