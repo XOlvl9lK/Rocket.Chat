@@ -54,6 +54,8 @@ const RoomMessageContent = ({ message, unread, all, mention, searchText }: RoomM
 							mentions={normalizedMessage.mentions}
 							channels={normalizedMessage.channels}
 							searchText={searchText}
+							isEditor={message?.t === 'editor'}
+							msg={message.msg}
 						/>
 					)}
 					{encrypted && normalizedMessage.e2e === 'pending' && t('E2E_message_encrypted_placeholder')}

@@ -32,7 +32,7 @@ const process = async (chat: ChatAPI, message: IMessage): Promise<void> => {
 	await call('sendMessage', message);
 };
 
-export const sendMessage = async (chat: ChatAPI, { text, tshow }: { text: string; tshow?: boolean }): Promise<boolean> => {
+export const sendMessage = async (chat: ChatAPI, { text, tshow, isEditor }: { text: string; tshow?: boolean, isEditor?: boolean }): Promise<boolean> => {
 	if (!(await chat.data.isSubscribedToRoom())) {
 		try {
 			await chat.data.joinRoom();
@@ -56,6 +56,7 @@ export const sendMessage = async (chat: ChatAPI, { text, tshow }: { text: string
 			sendToChannel: tshow,
 			quotedMessages: chat.composer?.quotedMessages.get() ?? [],
 			originalMessage: chat.currentEditing ? await chat.data.findMessageByID(chat.currentEditing.mid) : null,
+			isEditor,
 		});
 
 		try {

@@ -14,7 +14,7 @@ import type { DataAPI } from './ChatAPI';
 export const createDataAPI = ({ rid, tmid }: { rid: IRoom['_id']; tmid: IMessage['_id'] | undefined }): DataAPI => {
 	const composeMessage = async (
 		text: string,
-		{ sendToChannel, quotedMessages, originalMessage }: { sendToChannel?: boolean; quotedMessages: IMessage[]; originalMessage?: IMessage },
+		{ sendToChannel, quotedMessages, originalMessage, isEditor }: { sendToChannel?: boolean; quotedMessages: IMessage[]; originalMessage?: IMessage, isEditor?: boolean },
 	): Promise<IMessage> => {
 		const msg = await prependReplies(text, quotedMessages);
 
@@ -28,6 +28,7 @@ export const createDataAPI = ({ rid, tmid }: { rid: IRoom['_id']; tmid: IMessage
 				tmid: effectiveTMID,
 				...(sendToChannel && { tshow: sendToChannel }),
 			}),
+			...(isEditor && { t: 'editor' }),
 			msg,
 		})) as IMessage;
 	};
