@@ -14,7 +14,7 @@ import {
 import { useTranslation, useUserPreference, useLayout } from '@rocket.chat/ui-contexts';
 import { useMutation } from '@tanstack/react-query';
 import type { MouseEventHandler, ReactElement, FormEvent, KeyboardEventHandler, KeyboardEvent, Ref, ClipboardEventHandler } from 'react';
-import React, { memo, useRef, useReducer, useCallback, useState, useRef } from 'react';
+import React, { memo, useRef, useReducer, useCallback, useState } from 'react';
 import { useSubscription } from 'use-subscription';
 
 import { EmojiPicker } from '../../../../../../../app/emoji/client';
@@ -82,7 +82,7 @@ type MessageBoxProps = {
 	rid: IRoom['_id'];
 	tmid?: IMessage['_id'];
 	readOnly: boolean;
-	onSend?: (params: { value: string; tshow?: boolean, isEditor }) => Promise<void>;
+	onSend?: (params: { value: string; tshow?: boolean, isEditor?: boolean }) => Promise<void>;
 	onJoin?: () => Promise<void>;
 	onResize?: () => void;
 	onTyping?: () => void;
@@ -137,6 +137,10 @@ const MessageBox = ({
 				return;
 			}
 			chat.setComposerAPI(createComposerAPI(node, storageID));
+			chat.setEditorManager({
+				setContent: (content) => editorManager.current?.setContent(content),
+				openEditor: () => setIsEditor(true),
+			})
 		},
 		[chat, storageID],
 	);
@@ -401,22 +405,19 @@ const MessageBox = ({
 			{isRecordingVideo && <VideoMessageRecorder reference={messageComposerRef} rid={rid} tmid={tmid} />}
 			<MessageComposer ref={messageComposerRef} variant={isEditing ? 'editing' : undefined}>
 				{isRecordingAudio && <AudioMessageRecorder rid={rid} isMicrophoneDenied={isMicrophoneDenied} />}
-				{isEditor ?
-					<MessageEditor ref={editorManager} />
-					:
-					<MessageComposerInput
-						ref={mergedRefs as unknown as Ref<HTMLInputElement>}
-						aria-label={t('Message')}
-						name='msg'
-						disabled={isRecording || !canSend}
-						onChange={setTyping}
-						style={textAreaStyle}
-						placeholder={t('Message')}
-						onKeyDown={handler}
-						onPaste={handlePaste}
-						aria-activedescendant={ariaActiveDescendant}
-					/>
-				}
+				{!isEditor && <MessageComposerInput
+					ref={mergedRefs as unknown as Ref<HTMLInputElement>}
+					aria-label={t('Message')}
+					name='msg'
+					disabled={isRecording || !canSend}
+					onChange={setTyping}
+					style={textAreaStyle}
+					placeholder={t('Message')}
+					onKeyDown={handler}
+					onPaste={handlePaste}
+					aria-activedescendant={ariaActiveDescendant}
+				/>}
+				<MessageEditor ref={editorManager} isVisible={isEditor} />
 				<div ref={shadowRef} style={shadowStyle} />
 				<MessageComposerToolbar>
 					<MessageComposerToolbarActions aria-label={t('Message_composer_toolbox_primary_actions')}>

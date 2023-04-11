@@ -41,7 +41,6 @@ export const sendMessage = async (chat: ChatAPI, { text, tshow, isEditor }: { te
 			return false;
 		}
 	}
-
 	await chat.data.markRoomAsRead();
 
 	text = text.trim();
@@ -50,7 +49,6 @@ export const sendMessage = async (chat: ChatAPI, { text, tshow, isEditor }: { te
 		// Nothing to do
 		return false;
 	}
-
 	if (text) {
 		const message = await chat.data.composeMessage(text, {
 			sendToChannel: tshow,

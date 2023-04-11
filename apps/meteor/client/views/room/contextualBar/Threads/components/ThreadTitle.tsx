@@ -10,7 +10,12 @@ type ThreadTitleProps = {
 
 const ThreadTitle = ({ mainMessage }: ThreadTitleProps) => {
 	const innerHTML = useMemo(() => ({ __html: normalizeThreadTitle(mainMessage) }), [mainMessage]);
-	return <VerticalBar.Text dangerouslySetInnerHTML={innerHTML} />;
+	const isEditor = useMemo(() => mainMessage?.t === 'editor', [mainMessage]);
+
+	return isEditor ?
+		<VerticalBar.Text>{mainMessage?.u.username}</VerticalBar.Text>
+		:
+		<VerticalBar.Text dangerouslySetInnerHTML={innerHTML} />;
 };
 
 export default ThreadTitle;
