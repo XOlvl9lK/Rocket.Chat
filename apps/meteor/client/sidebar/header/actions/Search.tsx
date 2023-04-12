@@ -16,7 +16,7 @@ const Search: VFC<Omit<HTMLAttributes<HTMLElement>, 'is'>> = (props) => {
 	const ref = useRef<HTMLElement>(null);
 	const handleCloseGlobalSearch = useMutableCallback(() => {
 		setGlobalSearchOpen(false);
-		sidebarWidthContext.setWidth(280);
+		sidebarWidthContext.setWidth(300);
 	});
 	const handleCloseSearch = useMutableCallback(() => {
 		setSearchOpen(false);

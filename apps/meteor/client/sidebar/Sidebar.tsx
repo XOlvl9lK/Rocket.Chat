@@ -23,7 +23,9 @@ const Sidebar = () => {
 	const { isMobile, sidebar } = useLayout();
 	const [bannerDismissed, setBannerDismissed] = useSessionStorage('presence_cap_notifier', false);
 	const presenceDisabled = useSetting<boolean>('Presence_broadcast_disabled');
-	const [sidebarWidth, setSidebarWidth] = useState(280)
+	const [sidebarWidth, setSidebarWidth] = useState(300)
+
+	console.log('sidebarWidth', sidebarWidth);
 
 	const context = useMemo<SidebarWidthContextValue>(() => ({
 		setWidth: (width: number) => setSidebarWidth(width)
@@ -71,10 +73,10 @@ const Sidebar = () => {
 
 		@media (min-width: 1372px) {
 			/* 1440px -68px (eletron menu) */
-			flex: 0 0 20%;
+			//flex: 0 0 20%;
 
-			width: 20%;
-			max-width: 20%;
+			//width: 20%;
+			//max-width: 20%;
 		}
 	`;
 

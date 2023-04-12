@@ -44,7 +44,7 @@ const MessageHeader = ({ message, showChannel }: MessageHeaderProps): ReactEleme
 
 	const chat = useChat();
 
-	const isChannel = useMemo(() => message?.r?.t === 'c', [message])
+	const isChannel = useMemo(() => !!message?.r?.name, [message])
 
 	return (
 		<FuselageMessageHeader>
