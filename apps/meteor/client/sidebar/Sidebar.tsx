@@ -2,12 +2,20 @@ import { css } from '@rocket.chat/css-in-js';
 import { Box, Palette } from '@rocket.chat/fuselage';
 import { useSessionStorage } from '@rocket.chat/fuselage-hooks';
 import { useLayout, useSetting, useUserPreference } from '@rocket.chat/ui-contexts';
-import React from 'react';
+import React, { createContext, useState, useMemo } from 'react';
 
 import SidebarRoomList from './RoomList';
 import SidebarFooter from './footer';
 import SidebarHeader from './header';
 import StatusDisabledSection from './sections/StatusDisabledSection';
+
+type SidebarWidthContextValue = {
+	setWidth: (width: number) => void
+}
+
+export const SidebarWidthContext = createContext<SidebarWidthContextValue>({
+	setWidth: (width) => {}
+})
 
 const Sidebar = () => {
 	const sidebarViewMode = useUserPreference('sidebarViewMode');
@@ -15,6 +23,11 @@ const Sidebar = () => {
 	const { isMobile, sidebar } = useLayout();
 	const [bannerDismissed, setBannerDismissed] = useSessionStorage('presence_cap_notifier', false);
 	const presenceDisabled = useSetting<boolean>('Presence_broadcast_disabled');
+	const [sidebarWidth, setSidebarWidth] = useState(280)
+
+	const context = useMemo<SidebarWidthContextValue>(() => ({
+		setWidth: (width: number) => setSidebarWidth(width)
+	}), [])
 
 	const sideBarBackground = css`
 		background-color: ${Palette.surface['surface-tint']};
@@ -25,9 +38,9 @@ const Sidebar = () => {
 		z-index: 2;
 		display: flex;
 		flex-direction: column;
-		flex: 0 0 var(--sidebar-width);
-		width: var(--sidebar-width);
-		max-width: var(--sidebar-width);
+		flex: 0 0 ${sidebarWidth}px;
+		width: ${sidebarWidth}px;
+		max-width: ${sidebarWidth}px;
 		height: 100%;
 		user-select: none;
 		transition: transform 0.3s;
@@ -101,10 +114,12 @@ const Sidebar = () => {
 					role='navigation'
 					data-qa-opened={sidebar.isCollapsed ? 'false' : 'true'}
 				>
-					<SidebarHeader />
-					{presenceDisabled && !bannerDismissed && <StatusDisabledSection onDismiss={() => setBannerDismissed(true)} />}
-					<SidebarRoomList />
-					<SidebarFooter />
+					<SidebarWidthContext.Provider value={context}>
+						<SidebarHeader />
+						{presenceDisabled && !bannerDismissed && <StatusDisabledSection onDismiss={() => setBannerDismissed(true)} />}
+						<SidebarRoomList />
+						<SidebarFooter />
+					</SidebarWidthContext.Provider>
 				</Box>
 			</Box>
 			{isMobile && (

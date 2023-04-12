@@ -75,7 +75,7 @@ const SearchRow = ({ message, showUserAvatar, searchText }: RoomMessageProps) =>
 			</MessageLeftContainer>
 
 			<MessageContainer>
-				<MessageHeader message={message} />
+				<MessageHeader message={message} showChannel />
 
 				{ignored ? (
 					<IgnoredContent onShowMessageIgnored={toggleDisplayIgnoredMessage} />
