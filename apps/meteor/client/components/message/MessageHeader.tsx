@@ -9,7 +9,7 @@ import {
 } from '@rocket.chat/fuselage';
 import { useTranslation } from '@rocket.chat/ui-contexts';
 import type { ReactElement } from 'react';
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 
 import { getUserDisplayName } from '../../../lib/getUserDisplayName';
 import { useFormatDateAndTime } from '../../hooks/useFormatDateAndTime';
@@ -24,9 +24,10 @@ import { useMessageListShowUsername, useMessageListShowRealName, useMessageListS
 
 type MessageHeaderProps = {
 	message: IMessage;
+	showChannel?: boolean
 };
 
-const MessageHeader = ({ message }: MessageHeaderProps): ReactElement => {
+const MessageHeader = ({ message, showChannel }: MessageHeaderProps): ReactElement => {
 	const t = useTranslation();
 
 	const formatTime = useFormatTime();
@@ -43,6 +44,8 @@ const MessageHeader = ({ message }: MessageHeaderProps): ReactElement => {
 
 	const chat = useChat();
 
+	const isChannel = useMemo(() => message?.r?.t === 'c', [message])
+
 	return (
 		<FuselageMessageHeader>
 			<MessageNameContainer>
@@ -56,6 +59,7 @@ const MessageHeader = ({ message }: MessageHeaderProps): ReactElement => {
 							style: { cursor: 'pointer' },
 						})}
 				>
+					{showChannel && isChannel && `${message?.r?.name}:`}
 					{message.alias || getUserDisplayName(user.name, user.username, showRealName)}
 				</MessageName>
 				{showUsername && (
