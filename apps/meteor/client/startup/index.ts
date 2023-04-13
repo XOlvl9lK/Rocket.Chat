@@ -34,3 +34,4 @@ import './unread';
 import './UserDeleted';
 import './userRoles';
 import './userStatusManuallySet';
+import './browserPolicy';
