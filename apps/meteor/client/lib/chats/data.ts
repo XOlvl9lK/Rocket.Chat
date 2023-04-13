@@ -21,6 +21,8 @@ export const createDataAPI = ({ rid, tmid }: { rid: IRoom['_id']; tmid: IMessage
 		const effectiveRID = originalMessage?.rid ?? rid;
 		const effectiveTMID = originalMessage ? originalMessage.tmid : tmid;
 
+		console.log('msg', msg);
+
 		return (await onClientBeforeSendMessage({
 			_id: originalMessage?._id ?? Random.id(),
 			rid: effectiveRID,

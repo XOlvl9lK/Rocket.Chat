@@ -49,6 +49,7 @@ const MessageBoxReplies = (): ReactElement | null => {
 									ts: reply.ts,
 									attachments: reply?.attachments?.map((obj) => ({ ...obj, collapsed: true })),
 									collapsed: true,
+									isEditor: reply.t === 'editor'
 								} as MessageQuoteAttachment
 							}
 						/>

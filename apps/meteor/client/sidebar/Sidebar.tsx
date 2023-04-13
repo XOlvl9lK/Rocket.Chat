@@ -25,8 +25,6 @@ const Sidebar = () => {
 	const presenceDisabled = useSetting<boolean>('Presence_broadcast_disabled');
 	const [sidebarWidth, setSidebarWidth] = useState(300)
 
-	console.log('sidebarWidth', sidebarWidth);
-
 	const context = useMemo<SidebarWidthContextValue>(() => ({
 		setWidth: (width: number) => setSidebarWidth(width)
 	}), [])
