@@ -421,6 +421,11 @@ const MessageBox = ({
 				<div ref={shadowRef} style={shadowStyle} />
 				<MessageComposerToolbar>
 					<MessageComposerToolbarActions aria-label={t('Message_composer_toolbox_primary_actions')}>
+						<MessageComposerAction
+							icon='arrow-expand'
+							onClick={toggleEditor}
+							title={t('Editor')}
+						/>
 						{!isEditor &&
 							<>
 								<MessageComposerAction
@@ -451,11 +456,6 @@ const MessageBox = ({
 								<MessageComposerActionsDivider />
 							</>
 						}
-						<MessageComposerAction
-							icon='arrow-expand'
-							onClick={toggleEditor}
-							title={t('Editor')}
-						/>
 					</MessageComposerToolbarActions>
 					<MessageComposerToolbarSubmit>
 						{!canSend && (
