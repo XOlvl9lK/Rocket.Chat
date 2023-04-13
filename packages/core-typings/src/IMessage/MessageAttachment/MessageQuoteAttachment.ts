@@ -11,6 +11,7 @@ export type MessageQuoteAttachment = {
 	text: string;
 	md?: Root;
 	attachments?: Array<MessageQuoteAttachment>; // TODO this is cauising issues to define a model, see @ts-expect-error at apps/meteor/app/api/server/v1/channels.ts:274
+	isEditor?: boolean
 } & MessageAttachmentBase;
 
 export const isQuoteAttachment = (attachment: MessageAttachment): attachment is MessageQuoteAttachment => 'message_link' in attachment;

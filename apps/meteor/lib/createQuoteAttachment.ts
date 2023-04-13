@@ -14,5 +14,6 @@ export function createQuoteAttachment(message: IMessage | ITranslatedMessage, me
 		author_icon: getUserAvatarURL(message.u.username),
 		attachments: message.attachments || [],
 		ts: message.ts,
+		isEditor: message.t === 'editor'
 	};
 }
