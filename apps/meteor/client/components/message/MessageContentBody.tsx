@@ -53,6 +53,10 @@ const MessageContentBody = ({ mentions, channels, md, searchText, isEditor, msg 
 				border-radius: 2px;
 			}
 		}
+
+		li > ul {
+			margin-left: 10px;
+		}
 	`;
 
 	return (
