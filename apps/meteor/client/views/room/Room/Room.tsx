@@ -1,6 +1,6 @@
 import { useTranslation } from '@rocket.chat/ui-contexts';
 import type { ReactElement } from 'react';
-import React, { createElement, memo, Suspense } from 'react';
+import React, { createElement, memo, Suspense, useContext, useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import VerticalBarSkeleton from '../../../components/VerticalBar/VerticalBarSkeleton';
@@ -14,7 +14,7 @@ import AppsContextualBar from '../contextualBar/Apps';
 import { useAppsContextualBar } from '../hooks/useAppsContextualBar';
 import RoomLayout from '../layout/RoomLayout';
 import ChatProvider from '../providers/ChatProvider';
-import { SelectedMessagesProvider } from '../providers/SelectedMessagesProvider';
+import { SelectedMessagesProvider, selectedMessageStore } from '../providers/SelectedMessagesProvider';
 
 const Room = (): ReactElement => {
 	const t = useTranslation();
@@ -25,6 +25,10 @@ const Room = (): ReactElement => {
 
 	const tab = useTab();
 	const appsContextualBarContext = useAppsContextualBar();
+
+	useEffect(() => {
+		return () => selectedMessageStore.reset()
+	}, [room])
 
 	return (
 		<ChatProvider>

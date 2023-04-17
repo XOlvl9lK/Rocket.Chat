@@ -1,6 +1,7 @@
 import { Emitter } from '@rocket.chat/emitter';
 import type { FC } from 'react';
 import React, { useMemo } from 'react';
+import type { IMessage } from '@rocket.chat/core-typings';
 
 import { SelectedMessageContext } from '../MessageList/contexts/SelectedMessagesContext';
 
@@ -12,7 +13,7 @@ export const selectedMessageStore = new (class SelectMessageStore extends Emitte
 		toggleIsSelecting: boolean;
 	} & { [mid: string]: boolean }
 > {
-	store = new Set<string>();
+	store = new Map<string, IMessage>()
 
 	isSelecting = false;
 
@@ -26,22 +27,22 @@ export const selectedMessageStore = new (class SelectMessageStore extends Emitte
 	}
 
 	isSelected(mid: string): boolean {
-		return Boolean(this.store.has(mid));
+		return Boolean(this.store.has(mid))
 	}
 
-	getSelectedMessages(): string[] {
-		return Array.from(this.store);
+	getSelectedMessages(): IMessage[] {
+		return Array.from(this.store.values())
 	}
 
-	toggle(mid: string): void {
-		if (this.store.has(mid)) {
-			this.store.delete(mid);
-			this.emit(mid, false);
+	toggle(message: IMessage): void {
+		if (this.store.has(message._id)) {
+			this.store.delete(message._id)
+			this.emit(message._id, false);
 			this.emit('change');
 			return;
 		}
-		this.store.add(mid);
-		this.emit(mid, true);
+		this.store.set(message._id, message)
+		this.emit(message._id, true);
 		this.emit('change');
 	}
 
@@ -52,7 +53,7 @@ export const selectedMessageStore = new (class SelectMessageStore extends Emitte
 	clearStore(): void {
 		const selectedMessages = this.getSelectedMessages();
 		this.store.clear();
-		selectedMessages.forEach((mid) => this.emit(mid, false));
+		selectedMessages.forEach((message) => this.emit(message._id, false));
 		this.emit('change');
 	}
 
@@ -61,7 +62,14 @@ export const selectedMessageStore = new (class SelectMessageStore extends Emitte
 		this.isSelecting = false;
 		this.emit('toggleIsSelecting', false);
 	}
+
+	canDeleteSelectedMessages(user: any) {
+		const selectedMessages = this.getSelectedMessages()
+		return !selectedMessages.find(m => m.u._id !== user._id)
+	}
 })();
+
+export type TSelectMessageStore = typeof selectedMessageStore
 
 export const SelectedMessagesProvider: FC = ({ children }) => {
 	const value = useMemo(

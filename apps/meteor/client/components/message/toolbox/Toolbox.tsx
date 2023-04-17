@@ -4,11 +4,14 @@ import { MessageToolbox, MessageToolboxItem } from '@rocket.chat/fuselage';
 import { useUser, useSettings, useTranslation } from '@rocket.chat/ui-contexts';
 import { useQuery } from '@tanstack/react-query';
 import type { ReactElement } from 'react';
-import React, { memo, useMemo } from 'react';
+import React, { memo, useContext, useMemo } from 'react';
 
 import type { MessageActionContext } from '../../../../app/ui-utils/client/lib/MessageAction';
 import { MessageAction } from '../../../../app/ui-utils/client/lib/MessageAction';
-import { useIsSelecting } from '../../../views/room/MessageList/contexts/SelectedMessagesContext';
+import {
+	SelectedMessageContext,
+	useIsSelecting,
+} from '../../../views/room/MessageList/contexts/SelectedMessagesContext';
 import { useAutoTranslate } from '../../../views/room/MessageList/hooks/useAutoTranslate';
 import { useChat } from '../../../views/room/contexts/ChatContext';
 import { useToolboxContext } from '../../../views/room/contexts/ToolboxContext';
@@ -43,6 +46,7 @@ type ToolboxProps = {
 
 const Toolbox = ({ message, messageContext, room, subscription }: ToolboxProps): ReactElement | null => {
 	const t = useTranslation();
+	const { selectedMessageStore } = useContext(SelectedMessageContext);
 
 	const settings = useSettings();
 	const user = useUser();
@@ -82,7 +86,7 @@ const Toolbox = ({ message, messageContext, room, subscription }: ToolboxProps):
 		<MessageToolbox>
 			{actionsQueryResult.data?.message.map((action) => (
 				<MessageToolboxItem
-					onClick={(e): void => action.action(e, { message, tabbar: toolbox, room, chat, autoTranslateOptions })}
+					onClick={(e): void => action.action(e, { message, tabbar: toolbox, room, chat, autoTranslateOptions, selectedMessageStore })}
 					key={action.id}
 					icon={action.icon}
 					title={t(action.label)}
@@ -95,7 +99,7 @@ const Toolbox = ({ message, messageContext, room, subscription }: ToolboxProps):
 					options={
 						actionsQueryResult.data?.menu.map((action) => ({
 							...action,
-							action: (e): void => action.action(e, { message, tabbar: toolbox, room, chat, autoTranslateOptions }),
+							action: (e): void => action.action(e, { message, tabbar: toolbox, room, chat, autoTranslateOptions, selectedMessageStore }),
 						})) ?? []
 					}
 					data-qa-type='message-action-menu-options'

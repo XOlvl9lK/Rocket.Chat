@@ -73,11 +73,12 @@ Meteor.startup(async function () {
 			imperativeModal.open({
 				component: ShareMessageModal,
 				props: {
-					message,
+					messages: [message],
 					permalink,
 					onClose: (): void => {
 						imperativeModal.close();
 					},
+					enableCopy: true,
 				},
 			});
 		},
@@ -112,6 +113,18 @@ Meteor.startup(async function () {
 		order: -3,
 		group: ['message', 'menu'],
 	});
+
+	MessageAction.addButton({
+		id: 'forward-message',
+		icon: 'check',
+		label: 'Mark_message',
+		context: ['message', 'message-mobile'],
+		async action(_, props) {
+			const { message = messageArgs(this).msg, selectedMessageStore } = props;
+			selectedMessageStore.setIsSelecting(true)
+			selectedMessageStore.toggle(message)
+		}
+	})
 
 	MessageAction.addButton({
 		id: 'permalink',

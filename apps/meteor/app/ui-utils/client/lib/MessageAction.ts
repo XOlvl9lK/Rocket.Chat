@@ -13,6 +13,7 @@ import type { ToolboxContextValue } from '../../../../client/views/room/contexts
 import type { ChatContext } from '../../../../client/views/room/contexts/ChatContext';
 import { APIClient } from '../../../utils/client';
 import type { AutoTranslateOptions } from '../../../../client/views/room/MessageList/hooks/useAutoTranslate';
+import { TSelectMessageStore } from '/client/views/room/providers/SelectedMessagesProvider';
 
 const getMessage = async (msgId: string): Promise<Serialized<IMessage> | null> => {
 	try {
@@ -64,12 +65,14 @@ export type MessageActionConfig = {
 			room,
 			chat,
 			autoTranslateOptions,
+			selectedMessageStore,
 		}: {
 			message?: IMessage & Partial<ITranslatedMessage>;
 			tabbar: ToolboxContextValue;
 			room?: IRoom;
 			chat: ContextType<typeof ChatContext>;
 			autoTranslateOptions?: AutoTranslateOptions;
+			selectedMessageStore?: TSelectMessageStore;
 		},
 	) => any;
 	condition?: (props: MessageActionConditionProps) => Promise<boolean> | boolean;

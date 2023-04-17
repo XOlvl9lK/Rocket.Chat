@@ -53,7 +53,7 @@ const SystemMessage = ({ message, showUserAvatar }: SystemMessageProps): ReactEl
 	const messageType = MessageTypes.getType(message);
 
 	const isSelecting = useIsSelecting();
-	const toggleSelected = useToggleSelect(message._id);
+	const toggleSelected = useToggleSelect(message);
 	const isSelected = useIsSelectedMessage(message._id);
 	useCountSelected();
 

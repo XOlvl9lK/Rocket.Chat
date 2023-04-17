@@ -89,6 +89,25 @@ export class MessagesRaw extends BaseRaw<IMessage> implements IMessagesModel {
 		return this.find(query, options);
 	}
 
+	findManyByIds(ids: string[]) {
+		const query: Filter<IMessage> = {
+			_id: { $in: ids }
+		}
+
+		return this.find(
+			query,
+			{
+				projection: {
+					u: 1,
+					rid: 1,
+					file: 1,
+					files: 1,
+					ts: 1,
+				},
+			}
+		)
+	}
+
 	findPaginatedVisibleByMentionAndRoomId(
 		username: IUser['username'],
 		rid: IRoom['_id'],
