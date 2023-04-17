@@ -44,7 +44,7 @@ const ThreadMessagePreview = ({ message, showUserAvatar, sequential, ...props }:
 	const t = useTranslation();
 
 	const isSelecting = useIsSelecting();
-	const toggleSelected = useToggleSelect(message._id);
+	const toggleSelected = useToggleSelect(message);
 	const isSelected = useIsSelectedMessage(message._id);
 	useCountSelected();
 

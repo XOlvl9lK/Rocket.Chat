@@ -4,7 +4,7 @@ import { useClipboard } from '@rocket.chat/fuselage-hooks';
 import { useTranslation, useEndpoint, useToastMessageDispatch, useUserAvatarPath } from '@rocket.chat/ui-contexts';
 import { useMutation } from '@tanstack/react-query';
 import type { ReactElement } from 'react';
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 
 import UserAndRoomAutoCompleteMultiple from '../../../../components/UserAndRoomAutoCompleteMultiple.tsx';
@@ -15,10 +15,12 @@ import { prependReplies } from '../../../../lib/utils/prependReplies';
 type ShareMessageProps = {
 	onClose: () => void;
 	permalink: string;
-	message: IMessage;
+	messages: IMessage[];
+	enableCopy?: boolean
+	onSuccess?: () => void
 };
 
-const ShareMessageModal = ({ onClose, permalink, message }: ShareMessageProps): ReactElement => {
+const ShareMessageModal = ({ onClose, permalink, messages, enableCopy, onSuccess }: ShareMessageProps): ReactElement => {
 	const t = useTranslation();
 	const getUserAvatarPath = useUserAvatarPath();
 	const dispatchToastMessage = useToastMessageDispatch();
@@ -36,7 +38,7 @@ const ShareMessageModal = ({ onClose, permalink, message }: ShareMessageProps): 
 	const sendMessageMutation = useMutation({
 		mutationFn: async () => {
 			const optionalMessage = '';
-			const curMsg = await prependReplies(optionalMessage, [message]);
+			const curMsg = await prependReplies(optionalMessage, messages);
 
 			return Promise.all(
 				rooms.map(async (roomId) => {
@@ -51,6 +53,7 @@ const ShareMessageModal = ({ onClose, permalink, message }: ShareMessageProps): 
 		},
 		onSuccess: () => {
 			dispatchToastMessage({ type: 'success', message: t('Message_has_been_shared') });
+			onSuccess?.()
 		},
 		onError: (error: any) => {
 			dispatchToastMessage({ type: 'error', message: error });
@@ -60,19 +63,20 @@ const ShareMessageModal = ({ onClose, permalink, message }: ShareMessageProps): 
 		},
 	});
 
-	const avatarUrl = getUserAvatarPath(message.u.username);
-
-	const displayName = useUserDisplayName(message.u);
-
-	const attachment = {
-		author_name: String(displayName),
-		author_link: '',
-		author_icon: avatarUrl,
-		message_link: '',
-		text: message.msg,
-		attachments: message.attachments as MessageQuoteAttachment[],
-		md: message.md,
-	};
+	const attachments = useMemo(() => {
+		return messages?.map(m => {
+			const avatarUrl = getUserAvatarPath(m.u.username);
+			return {
+				author_name: m.u?.username,
+				author_link: '',
+				author_icon: avatarUrl,
+				message_link: '',
+				text: m.msg,
+				attachments: m.attachments as MessageQuoteAttachment[],
+				md: m.md,
+			}
+		}) || []
+	}, [messages])
 
 	const handleCopy = (): void => {
 		if (!hasCopied) {
@@ -102,15 +106,17 @@ const ShareMessageModal = ({ onClose, permalink, message }: ShareMessageProps): 
 						{!rooms.length && <Field.Hint>{t('Select_atleast_one_channel_to_share_the_messsage')}</Field.Hint>}
 					</Field>
 					<Field>
-						<QuoteAttachment attachment={attachment} />
+						{attachments.map((attachment, idx) => <QuoteAttachment key={`attachment-${idx}`} attachment={attachment} />)}
 					</Field>
 				</FieldGroup>
 			</Modal.Content>
 			<Modal.Footer>
 				<ButtonGroup>
-					<Button onClick={handleCopy} disabled={hasCopied}>
-						{hasCopied ? t('Copied') : t('Copy_Link')}
-					</Button>
+					{enableCopy &&
+						<Button onClick={handleCopy} disabled={hasCopied}>
+							{hasCopied ? t('Copied') : t('Copy_Link')}
+						</Button>
+					}
 					<Button disabled={!rooms.length || sendMessageMutation.isLoading} onClick={() => sendMessageMutation.mutate()} primary>
 						{t('Share')}
 					</Button>

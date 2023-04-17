@@ -1,6 +1,6 @@
 /* eslint-disable complexity */
 import type { IMessage, IRoom, ISubscription } from '@rocket.chat/core-typings';
-import { Button, Tag, Box } from '@rocket.chat/fuselage';
+import { Button, Tag, Box, Icon, ButtonGroup } from '@rocket.chat/fuselage';
 import { useContentBoxSize, useMutableCallback } from '@rocket.chat/fuselage-hooks';
 import {
 	MessageComposerAction,
@@ -42,6 +42,8 @@ import MessageBoxFormattingToolbar from './MessageBoxFormattingToolbar';
 import MessageBoxReplies from './MessageBoxReplies';
 import { useMessageBoxAutoFocus } from './hooks/useMessageBoxAutoFocus';
 import { MessageEditor, EditorManager } from './MessageEditor';
+import { useIsSelecting } from '/client/views/room/MessageList/contexts/SelectedMessagesContext';
+import SelectedMessagesActions from '/client/views/room/components/body/composer/messageBox/SelectedMessagesActions';
 
 const reducer = (_: unknown, event: FormEvent<HTMLInputElement>): boolean => {
 	const target = event.target as HTMLInputElement;
@@ -112,6 +114,7 @@ const MessageBox = ({
 	const [typing, setTyping] = useReducer(reducer, false);
 	const [isEditor, setIsEditor] = useState(false);
 	const editorManager = useRef<EditorManager | null>(null)
+	const isSelecting = useIsSelecting()
 
 	const { isMobile } = useLayout();
 	const sendOnEnterBehavior = useUserPreference<'normal' | 'alternative' | 'desktop'>('sendOnEnter') || isMobile;
@@ -403,79 +406,83 @@ const MessageBox = ({
 			)}
 
 			{isRecordingVideo && <VideoMessageRecorder reference={messageComposerRef} rid={rid} tmid={tmid} />}
-			<MessageComposer ref={messageComposerRef} variant={isEditing ? 'editing' : undefined}>
-				{isRecordingAudio && <AudioMessageRecorder rid={rid} isMicrophoneDenied={isMicrophoneDenied} />}
-				{!isEditor && <MessageComposerInput
-					ref={mergedRefs as unknown as Ref<HTMLInputElement>}
-					aria-label={t('Message')}
-					name='msg'
-					disabled={isRecording || !canSend}
-					onChange={setTyping}
-					style={textAreaStyle}
-					placeholder={t('Message')}
-					onKeyDown={handler}
-					onPaste={handlePaste}
-					aria-activedescendant={ariaActiveDescendant}
-				/>}
-				<MessageEditor ref={editorManager} isVisible={isEditor} />
-				<div ref={shadowRef} style={shadowStyle} />
-				<MessageComposerToolbar>
-					<MessageComposerToolbarActions aria-label={t('Message_composer_toolbox_primary_actions')}>
-						<MessageComposerAction
-							icon='arrow-expand'
-							onClick={toggleEditor}
-							title={t('Editor')}
-						/>
-						{!isEditor &&
-							<>
-								<MessageComposerAction
-									icon='emoji'
-									disabled={!useEmojis || isRecording || !canSend}
-									onClick={handleOpenEmojiPicker}
-									title={t('Emoji')}
-								/>
-								<MessageComposerActionsDivider />
-								{chat.composer && formatters.length > 0 && (
-									<MessageBoxFormattingToolbar
-										composer={chat.composer}
-										variant={sizes.inlineSize < 480 ? 'small' : 'large'}
-										items={formatters}
-										disabled={isRecording || !canSend}
-									/>
-								)}
-								<MessageComposerActionsDivider />
-								<MessageBoxActionsToolbar
-									variant={sizes.inlineSize < 480 ? 'small' : 'large'}
-									isRecording={isRecording}
-									typing={typing}
-									canSend={canSend}
-									rid={rid}
-									tmid={tmid}
-									isMicrophoneDenied={isMicrophoneDenied}
-								/>
-								<MessageComposerActionsDivider />
-							</>
-						}
-					</MessageComposerToolbarActions>
-					<MessageComposerToolbarSubmit>
-						{!canSend && (
-							<Button small primary onClick={onJoin} disabled={joinMutation.isLoading}>
-								{t('Join')}
-							</Button>
-						)}
-						{canSend && (
+			{isSelecting ?
+				<SelectedMessagesActions />
+				:
+				<MessageComposer ref={messageComposerRef} variant={isEditing ? 'editing' : undefined}>
+					{isRecordingAudio && <AudioMessageRecorder rid={rid} isMicrophoneDenied={isMicrophoneDenied} />}
+					{!isEditor && <MessageComposerInput
+						ref={mergedRefs as unknown as Ref<HTMLInputElement>}
+						aria-label={t('Message')}
+						name='msg'
+						disabled={isRecording || !canSend}
+						onChange={setTyping}
+						style={textAreaStyle}
+						placeholder={t('Message')}
+						onKeyDown={handler}
+						onPaste={handlePaste}
+						aria-activedescendant={ariaActiveDescendant}
+					/>}
+					<MessageEditor ref={editorManager} isVisible={isEditor} />
+					<div ref={shadowRef} style={shadowStyle} />
+					<MessageComposerToolbar>
+						<MessageComposerToolbarActions aria-label={t('Message_composer_toolbox_primary_actions')}>
 							<MessageComposerAction
-								aria-label={t('Send')}
-								icon='send'
-								disabled={isEditor ? false : !canSend || (!typing && !isEditing)}
-								onClick={handleSendMessage}
-								secondary={typing || isEditing}
-								info={typing || isEditing}
+								icon='arrow-expand'
+								onClick={toggleEditor}
+								title={t('Editor')}
 							/>
-						)}
-					</MessageComposerToolbarSubmit>
-				</MessageComposerToolbar>
-			</MessageComposer>
+							{!isEditor &&
+								<>
+									<MessageComposerAction
+										icon='emoji'
+										disabled={!useEmojis || isRecording || !canSend}
+										onClick={handleOpenEmojiPicker}
+										title={t('Emoji')}
+									/>
+									<MessageComposerActionsDivider />
+									{chat.composer && formatters.length > 0 && (
+										<MessageBoxFormattingToolbar
+											composer={chat.composer}
+											variant={sizes.inlineSize < 480 ? 'small' : 'large'}
+											items={formatters}
+											disabled={isRecording || !canSend}
+										/>
+									)}
+									<MessageComposerActionsDivider />
+									<MessageBoxActionsToolbar
+										variant={sizes.inlineSize < 480 ? 'small' : 'large'}
+										isRecording={isRecording}
+										typing={typing}
+										canSend={canSend}
+										rid={rid}
+										tmid={tmid}
+										isMicrophoneDenied={isMicrophoneDenied}
+									/>
+									<MessageComposerActionsDivider />
+								</>
+							}
+						</MessageComposerToolbarActions>
+						<MessageComposerToolbarSubmit>
+							{!canSend && (
+								<Button small primary onClick={onJoin} disabled={joinMutation.isLoading}>
+									{t('Join')}
+								</Button>
+							)}
+							{canSend && (
+								<MessageComposerAction
+									aria-label={t('Send')}
+									icon='send'
+									disabled={isEditor ? false : !canSend || (!typing && !isEditing)}
+									onClick={handleSendMessage}
+									secondary={typing || isEditing}
+									info={typing || isEditing}
+								/>
+							)}
+						</MessageComposerToolbarSubmit>
+					</MessageComposerToolbar>
+				</MessageComposer>
+			}
 			<ComposerUserActionIndicator rid={rid} tmid={tmid} />
 		</>
 	);

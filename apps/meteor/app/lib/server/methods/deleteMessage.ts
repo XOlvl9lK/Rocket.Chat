@@ -11,6 +11,7 @@ declare module '@rocket.chat/ui-contexts' {
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	interface ServerMethods {
 		deleteMessage({ _id }: Pick<IMessage, '_id'>): void;
+		deleteMessages({ ids }: { ids: string[] }): void;
 	}
 }
 
@@ -50,4 +51,35 @@ Meteor.methods<ServerMethods>({
 
 		return deleteMessage(originalMessage, (await Meteor.userAsync()) as IUser);
 	},
+
+	async deleteMessages({ ids }) {
+		console.log('delete messages call');
+		const uid = Meteor.userId();
+
+		if (!uid) {
+			throw new Meteor.Error('error-invalid-user', 'Invalid user', {
+				method: 'deleteMessages',
+			});
+		}
+
+		const user = await Meteor.userAsync();
+		const cursor = await Messages.findManyByIds(ids);
+
+		const messages = await cursor.toArray()
+
+		let canDeleteMessages = true;
+
+		for (let i = 0; i < messages.length; i++) {
+			if (!(await canDeleteMessageAsync(uid, messages[i]))) canDeleteMessages = false;
+		}
+
+		if (!messages.length || !canDeleteMessages) {
+			throw new Meteor.Error('error-action-not-allowed', 'Not allowed', {
+				method: 'deleteMessages',
+				action: 'Delete_message',
+			});
+		}
+
+		await Promise.all(messages.map(message => deleteMessage(message, user as IUser)));
+	}
 });
