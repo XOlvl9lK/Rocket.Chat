@@ -11506,6 +11506,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/domutils@npm:*":
+  version: 1.7.4
+  resolution: "@types/domutils@npm:1.7.4"
+  dependencies:
+    domhandler: ^2.4.0
+  checksum: 9041ed4d250b96068f1ba7c568b9416a63dc8f94e9fd63dc5fc8c1552e84fa2d5a5fe4bf42dd37edd8a4e29b22e3c738b20243dcee8b83fcf1b6ca94f154584f
+  languageName: node
+  linkType: hard
+
 "@types/ejson@npm:^2, @types/ejson@npm:^2.2.0":
   version: 2.2.0
   resolution: "@types/ejson@npm:2.2.0"

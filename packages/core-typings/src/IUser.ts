@@ -177,6 +177,7 @@ export interface IUser extends IRocketChatRecord {
 		};
 	};
 	importIds?: string[];
+	isOnCall?: boolean;
 }
 
 export interface IRegisterUser extends IUser {

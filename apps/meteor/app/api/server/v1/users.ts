@@ -842,6 +842,7 @@ API.v1.addRoute(
 					utcOffset: 1,
 					statusText: 1,
 					avatarETag: 1,
+					isOnCall: 1,
 				},
 			};
 
@@ -1158,9 +1159,9 @@ API.v1.addRoute(
 						},
 					);
 
-					const { _id, username, statusText, roles, name } = user;
+					const { _id, username, statusText, roles, name, isOnCall } = user;
 					void api.broadcast('presence.status', {
-						user: { status, _id, username, statusText, roles, name },
+						user: { status, _id, username, statusText, roles, name, isOnCall },
 						previousStatus: user.status,
 					});
 				} else {
@@ -1206,6 +1207,42 @@ API.v1.addRoute(
 		},
 	},
 );
+
+API.v1.addRoute(
+	'users.setIsOnCall',
+	{ authRequired: true },
+	{
+		async post() {
+			const { isOnCall } = this.bodyParams
+
+			const user = await Users.findOneById(this.userId)
+
+			if (!user) {
+				return API.v1.unauthorized();
+			}
+
+			if (user.isOnCall !== isOnCall) {
+				await Users.updateOne(
+					{ _id: user._id },
+					{
+						$set: {
+							isOnCall,
+						}
+					}
+				)
+			}
+
+			const { _id, username, statusText, roles, name } = user;
+
+			void api.broadcast('presence.status', {
+				user: { status: user.status, _id, username, statusText, roles, name, isOnCall },
+				previousStatus: user.status,
+			});
+
+			return API.v1.success();
+		}
+	}
+)
 
 settings.watch<number>('Rate_Limiter_Limit_RegisterUser', (value) => {
 	const userRegisterRoute = '/api/v1/users.registerpost';
