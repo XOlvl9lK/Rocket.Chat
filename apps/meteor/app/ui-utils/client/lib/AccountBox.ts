@@ -36,6 +36,10 @@ class AccountBoxBase {
 		return APIClient.post('/v1/users.setStatus', { status, message: statusText });
 	}
 
+	public setIsOnCall(isOnCall: boolean) {
+		return APIClient.post('/v1/users.setIsOnCall', { isOnCall })
+	}
+
 	public async addItem(newItem: IAppAccountBoxItem): Promise<void> {
 		Tracker.nonreactive(() => {
 			const actual = this.items.get();
