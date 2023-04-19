@@ -4,8 +4,14 @@ import { MessageAction } from '../../ui-utils/client';
 import { messageArgs } from '../../../client/lib/utils/messageArgs';
 import { EmojiPicker } from '../../emoji/client';
 import { roomCoordinator } from '../../../client/lib/rooms/roomCoordinator';
+import { createTemplateForComponent } from '/client/lib/portals/createTemplateForComponent';
+import { HTML } from 'meteor/htmljs';
 
 Meteor.startup(function () {
+	createTemplateForComponent('EmojiPickerWrapper', () => import('../../../client/views/composer/EmojiPickerWrapper'), {
+		renderContainerView: () => HTML.DIV({ class: 'emoji-picker rc-popover__content' }),
+	});
+
 	MessageAction.addButton({
 		id: 'reaction-message',
 		icon: 'add-reaction',
