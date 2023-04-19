@@ -4,33 +4,34 @@ import { v4 as uuidv4 } from 'uuid';
 
 import VideoConfBlockModal from '../VideoConfBlockModal';
 import { useAmIOnCall } from './useAmIOnCall';
+import { useUser } from '@rocket.chat/ui-contexts';
 
 type WindowMaybeDesktop = typeof window & {
 	RocketChatDesktop?: {
-		openInternalVideoChatWindow?: (url: string, options?: { onClose?: () => void }) => void;
+		openInternalVideoChatWindow?: (url: string, options?: any) => void;
 	};
 };
 
 export const useVideoOpenCall = () => {
 	const setModal = useSetModal();
-	const trigger = useAmIOnCall()
+	const user = useUser()
+	const { onCall, offCall } = useAmIOnCall()
 
 	const handleOpenCall = useCallback(
 		(callUrl: string) => {
 			const windowMaybeDesktop = window as WindowMaybeDesktop;
 			const videoChatWindowId = uuidv4()
 			if (windowMaybeDesktop.RocketChatDesktop?.openInternalVideoChatWindow) {
-				const reset = trigger(videoChatWindowId)
-				windowMaybeDesktop.RocketChatDesktop.openInternalVideoChatWindow(callUrl, { onClose: reset });
+				windowMaybeDesktop.RocketChatDesktop.openInternalVideoChatWindow(callUrl, user?._id);
 			} else {
 				const open = () => window.open(callUrl);
 				const popup = open();
 
 				if (popup !== null) {
-					const reset = trigger(videoChatWindowId);
+					onCall(videoChatWindowId);
 					const interval = setInterval(() => {
 						if (popup.closed) {
-							reset();
+							offCall(videoChatWindowId);
 							clearInterval(interval);
 						}
 					}, 3000);
@@ -40,7 +41,7 @@ export const useVideoOpenCall = () => {
 				setModal(<VideoConfBlockModal onClose={(): void => setModal(null)} onConfirm={open} />);
 			}
 		},
-		[setModal],
+		[setModal, user, offCall, onCall],
 	);
 
 	return handleOpenCall;

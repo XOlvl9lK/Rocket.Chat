@@ -12,8 +12,8 @@ type ReactiveUserStatusProps = {
 const ReactiveUserStatus = ({ uid, ...props }: ReactiveUserStatusProps): ReactElement => {
 	const presence = usePresence(uid);
 
-	const status = usePresence(uid)?.status;
-	const isOnCall = usePresence(uid)?.isOnCall;
+	const status = presence?.status;
+	const isOnCall = presence?.isOnCall;
 
 	if (isOnCall && status !== 'offline') {
 		return <Icon name='phone' size='x16' />;
