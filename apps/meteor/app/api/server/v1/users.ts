@@ -1210,12 +1210,12 @@ API.v1.addRoute(
 
 API.v1.addRoute(
 	'users.setIsOnCall',
-	{ authRequired: true },
+	{ authRequired: false },
 	{
 		async post() {
-			const { isOnCall } = this.bodyParams
+			const { isOnCall, userId } = this.bodyParams
 
-			const user = await Users.findOneById(this.userId)
+			const user = await Users.findOneById(userId)
 
 			if (!user) {
 				return API.v1.unauthorized();
