@@ -68,13 +68,14 @@ export const MessageEditor = forwardRef(({ isVisible }: MessageEditorProps, ref)
 			apiKey='khlkfnfzk8g83f0ynbiap78i3bl4tiii94nkekasqzy2ztot'
 			init={{
 				content_css: false,
-				height: 250,
+				min_height: 250,
+				max_height: 500,
 				menubar: 'file edit view insert format tools table help',
-				plugins: 'print preview paste importcss searchreplace autolink directionality code visualblocks visualchars link template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount textpattern noneditable help charmap quickbars emoticons',
+				plugins: 'autoresize print preview paste importcss searchreplace autolink directionality code visualblocks visualchars link template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount textpattern noneditable help charmap quickbars emoticons',
 				toolbar: 'undo redo | bold italic underline strikethrough | fontselect fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | preview print | template link anchor codesample | ltr rtl',
 				content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
 				contextmenu: false,
-				resize: true,
+				resize: false,
 				branding: false,
 				autosave_ask_before_unload: false,
 				width: '100%',
