@@ -3,7 +3,7 @@ import { Match, check } from 'meteor/check';
 import { Messages, Users, Rooms, Subscriptions } from '@rocket.chat/models';
 import { escapeRegExp } from '@rocket.chat/string-helpers';
 import { Message } from '@rocket.chat/core-services';
-import type { IMessage } from '@rocket.chat/core-typings';
+import type { IMessage, IUser } from '@rocket.chat/core-typings';
 
 import { roomAccessAttributes } from '../../../authorization/server';
 import { hasPermissionAsync } from '../../../authorization/server/functions/hasPermission';
@@ -169,6 +169,53 @@ API.v1.addRoute(
 		},
 	},
 );
+
+API.v1.addRoute(
+	'chat.shareMessage',
+	{ authRequired: true },
+	{
+		async post() {
+			let { selected, message } = this.bodyParams
+
+			const user = Meteor.user() as IUser | null;
+
+			if (!user) {
+				API.v1.failure('User not found');
+			}
+
+			let isSelfShared = false
+			if (selected.find(s => s.id === user._id)) {
+				isSelfShared = true
+				selected = selected.filter(s => s.id !== user._id)
+			}
+
+			const optionsForDirectRooms = [
+				...selected.filter(s => s.type === 'user').map(s => [s.id, user._id]),
+				...(isSelfShared ? [[user._id]] : [])
+			]
+			const directRooms = await Promise.all(
+				optionsForDirectRooms.map(o => Rooms.findOneDirectRoomContainingAllUserIDs(o))
+			)
+
+			const roomIds = [
+				...selected.filter(s => s.type === 'channel').map(s => s.id),
+				...directRooms.map(r => r._id)
+			]
+
+			await Promise.all(roomIds.map(rid => processWebhookMessage(
+				{
+					roomId: rid,
+					text: message
+				},
+				user
+			)))
+
+			return API.v1.success({
+				ts: Date.now()
+			});
+		}
+	}
+)
 
 API.v1.addRoute(
 	'chat.search',
