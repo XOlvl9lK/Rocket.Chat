@@ -1,5 +1,8 @@
 import { Editor } from '@tinymce/tinymce-react';
 import React, { useRef, useEffect, forwardRef, useImperativeHandle, useCallback } from 'react';
+import { css } from '@rocket.chat/css-in-js';
+import { Box } from '@rocket.chat/fuselage';
+import { useEffectOnce } from '/client/hooks/useEffectOnce';
 
 // chars count editorRef.current?.plugins.wordcount.body.getCharacterCount()
 
@@ -8,6 +11,7 @@ export type EditorManager = {
 	getContent: () => string
 	clear: () => void
 	setContent: (content: string) => void
+	initializeContent: (content: string) => void
 }
 
 type MessageEditorProps = {
@@ -40,9 +44,24 @@ export const MessageEditor = forwardRef(({ isVisible }: MessageEditorProps, ref)
 		editorRef.current?.setContent(content)
 	}, [])
 
-	useImperativeHandle(ref, () => ({ isEmpty, getContent, clear, setContent }))
+	const initializeContent = useCallback((content: string) => {
+		if (!editorRef.current?.getContent()) {
+			setContent(content)
+		}
+	}, [])
 
-	return <div style={{ width: '100%', display: isVisible ? 'block' : 'none' }}>
+	useImperativeHandle(ref, () => ({ isEmpty, getContent, clear, setContent, initializeContent }))
+
+	useEffectOnce(Boolean(editorRef.current), () => {
+		editorRef.current?.iframeElement.removeAttribute('title')
+	}, [editorRef.current])
+
+	return <Box
+		className={css`
+			width: 100%;
+			display: ${isVisible ? 'block' : 'none'};
+		`}
+	>
 		<Editor
 			onInit={(evt, editor) => editorRef.current = editor}
 			initialValue=''
@@ -55,12 +74,12 @@ export const MessageEditor = forwardRef(({ isVisible }: MessageEditorProps, ref)
 				toolbar: 'undo redo | bold italic underline strikethrough | fontselect fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | preview print | template link anchor codesample | ltr rtl',
 				content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
 				contextmenu: false,
-				resize: false,
+				resize: true,
 				branding: false,
 				autosave_ask_before_unload: false,
 				width: '100%',
 				toolbar_mode: 'sliding',
 			}}
 		/>
-	</div>
+	</Box>
 })

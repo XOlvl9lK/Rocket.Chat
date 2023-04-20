@@ -368,8 +368,13 @@ const MessageBox = ({
 	const mergedRefs = useMessageComposerMergedRefs(c, textareaRef, callbackRef, autofocusRef);
 
 	const toggleEditor = useCallback(() => {
-		setIsEditor(prev => !prev)
-	}, [])
+		setIsEditor(prev => {
+			if (!prev) {
+				editorManager.current?.initializeContent(chat.composer?.text || '')
+			}
+			return !prev
+		})
+	}, [chat])
 
 	return (
 		<>
@@ -411,7 +416,7 @@ const MessageBox = ({
 				:
 				<MessageComposer ref={messageComposerRef} variant={isEditing ? 'editing' : undefined}>
 					{isRecordingAudio && <AudioMessageRecorder rid={rid} isMicrophoneDenied={isMicrophoneDenied} />}
-					{!isEditor && <MessageComposerInput
+					<MessageComposerInput
 						ref={mergedRefs as unknown as Ref<HTMLInputElement>}
 						aria-label={t('Message')}
 						name='msg'
@@ -422,7 +427,8 @@ const MessageBox = ({
 						onKeyDown={handler}
 						onPaste={handlePaste}
 						aria-activedescendant={ariaActiveDescendant}
-					/>}
+						display={isEditor ? 'none' : 'block'}
+					/>
 					<MessageEditor ref={editorManager} isVisible={isEditor} />
 					<div ref={shadowRef} style={shadowStyle} />
 					<MessageComposerToolbar>
