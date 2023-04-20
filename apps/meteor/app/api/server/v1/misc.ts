@@ -30,6 +30,7 @@ import { getLoggedInUser } from '../helpers/getLoggedInUser';
 import { getUserInfo } from '../helpers/getUserInfo';
 import { getPaginationItems } from '../helpers/getPaginationItems';
 import { getUserFromParams } from '../helpers/getUserFromParams';
+import { canAccessRoomAsync } from '/app/authorization';
 
 /**
  * @openapi
@@ -357,7 +358,6 @@ API.v1.addRoute(
 		async get() {
 			const { offset, count } = await getPaginationItems(this.queryParams);
 			const { sort, query } = await this.parseJsonQuery();
-			console.log('query', query);
 			const { text, type, workspace = 'local', showAllAndOnlyUsers = false } = query;
 
 			if (sort && Object.keys(sort).length > 1) {
@@ -396,7 +396,7 @@ API.v1.addRoute(
 	{
 		async get() {
 			const { query } = await this.parseJsonQuery();
-			const { rid } = query;
+			const { rid, text } = query;
 			const user = Meteor.user() as IUser | null;
 
 			if (!user) {
@@ -420,7 +420,7 @@ API.v1.addRoute(
 			};
 
 			const cursor = await Users.findByActiveUsersExcept(
-				'',
+				text,
 				room.t === 'd' ? room?.usernames || [] : [user.username],
 				options,
 				['username', 'name'],
@@ -437,6 +437,66 @@ API.v1.addRoute(
 		}
 	},
 );
+
+API.v1.addRoute(
+	'optionsToShareMessages',
+	{ authRequired: true },
+	{
+		async get() {
+			const { query } = await this.parseJsonQuery();
+			const { text = '' } = query;
+
+			const user = Meteor.user() as IUser | null;
+
+			if (!user) {
+				API.v1.failure('User not found');
+			}
+
+			const options = {
+				sort: { username: 1 },
+				projections: {
+					_id: 1,
+					username: 1,
+					name: 1,
+					nickname: 1,
+				}
+			};
+
+			const [users, rooms] = await Promise.all([
+				Users.findByActiveUsersExcept(
+					text,
+					[],
+					options,
+					['username', 'name'],
+					[{
+						type: 'user'
+					}]
+				).toArray(),
+				Rooms.findByNameOrFnameContainingAndTypes(
+					text,
+					['c', 'p']
+				).cursor.toArray()
+			])
+
+			const filteredRooms = []
+
+			for (let i = 0; i < rooms.length; i++) {
+				if (await canAccessRoomAsync(rooms[i], { _id: user._id})) {
+					filteredRooms.push(rooms[i])
+				}
+			}
+
+			const result = [
+				...users.map(u => ({ id: u._id, label: u.username, type: 'user' })),
+				...filteredRooms.map(r => ({ id: r._id, label: r.name, type: 'channel' }))
+			]
+
+			return API.v1.success({
+				result
+			})
+		}
+	}
+)
 
 API.v1.addRoute(
 	'pw.getPolicy',

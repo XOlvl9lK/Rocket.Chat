@@ -1,10 +1,12 @@
-import { Modal, Field, Button, MultiSelectFiltered } from '@rocket.chat/fuselage';
+import { Modal, Field, Button, MultiSelectFiltered, AutoComplete, Box, Option, OptionAvatar, OptionContent, Chip } from '@rocket.chat/fuselage';
 import { useDebouncedValue } from '@rocket.chat/fuselage-hooks';
 import { useTranslation, useEndpoint, useUser } from '@rocket.chat/ui-contexts';
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, ReactElement, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { VideoConfManager } from '/client/lib/VideoConfManager';
 import { dispatchToastMessage } from '/client/lib/toast';
+import UserAvatar from '/client/components/avatar/UserAvatar';
+import RoomAvatar from '/client/components/avatar/RoomAvatar';
 
 type InviteToCallModalProps = {
 	onClose: () => void
@@ -14,12 +16,15 @@ type InviteToCallModalProps = {
 
 const useLoadUsersToInvite = (roomId: string) => {
 	const getUsersToInvite = useEndpoint('GET', '/v1/users-to-invite');
+	const [filter, setFilter] = useState('')
+	const debouncedFilter = useDebouncedValue(filter, 500);
 
 	const { data } = useQuery(
-		['usersToInvite'],
+		['usersToInvite', debouncedFilter],
 		() => getUsersToInvite({
 			query: JSON.stringify({
-				rid: roomId
+				rid: roomId,
+				text: debouncedFilter
 			}),
 		}),
 		{
@@ -29,6 +34,8 @@ const useLoadUsersToInvite = (roomId: string) => {
 
 	return {
 		data,
+		filter,
+		setFilter,
 	}
 }
 
@@ -39,6 +46,8 @@ const InviteToCallModal = ({ callId, onClose, roomId }: InviteToCallModalProps) 
 
 	const {
 		data,
+		filter,
+		setFilter,
 	} = useLoadUsersToInvite(roomId)
 
 	const onInviteUsers = useCallback(() => {
@@ -54,6 +63,16 @@ const InviteToCallModal = ({ callId, onClose, roomId }: InviteToCallModalProps) 
 		}
 	}, [invited])
 
+	const options = useMemo(() => {
+		if (Array.isArray(data?.result) && data?.result?.length) {
+			return data.result.map(user => ({
+				value: user._id,
+				label: { name: user.username }
+			}))
+		}
+		return []
+	}, [data])
+
 	return (
 		<Modal>
 			<Modal.Header>
@@ -62,9 +81,29 @@ const InviteToCallModal = ({ callId, onClose, roomId }: InviteToCallModalProps) 
 			<Modal.Content>
 				<Field>
 					<Field.Row>
-						<MultiSelectFiltered
-							options={Array.isArray(data?.result) ? data?.result?.map(user => [user._id, user.username]) : []}
-							onChange={(values) => setInvited(values)}
+						<AutoComplete
+							value={invited}
+							onChange={(value) => setInvited(value as string[])}
+							filter={filter}
+							setFilter={setFilter}
+							multiple
+							renderSelected={({ selected: { value, label }, onRemove, ...props }): ReactElement => (
+								<Chip {...props} height='x20' value={value} onClick={onRemove} mie='x4'>
+									<UserAvatar size='x20' username={label.name} />
+									<Box is='span' margin='none' mis='x4'>
+										{label.name}
+									</Box>
+								</Chip>
+							)}
+							renderItem={({ value, label, ...props }): ReactElement => (
+								<Option key={value} {...props}>
+									<OptionAvatar>
+										<UserAvatar size='x20' username={label.name} />
+									</OptionAvatar>
+									<OptionContent>{label.name}</OptionContent>
+								</Option>
+							)}
+							options={options}
 						/>
 					</Field.Row>
 				</Field>

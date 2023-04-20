@@ -4,7 +4,7 @@ import { useClipboard } from '@rocket.chat/fuselage-hooks';
 import { useTranslation, useEndpoint, useToastMessageDispatch, useUserAvatarPath } from '@rocket.chat/ui-contexts';
 import { useMutation } from '@tanstack/react-query';
 import type { ReactElement } from 'react';
-import React, { memo, useMemo } from 'react';
+import React, { memo, useMemo, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 
 import UserAndRoomAutoCompleteMultiple from '../../../../components/UserAndRoomAutoCompleteMultiple.tsx';
@@ -25,6 +25,7 @@ const ShareMessageModal = ({ onClose, permalink, messages, enableCopy, onSuccess
 	const getUserAvatarPath = useUserAvatarPath();
 	const dispatchToastMessage = useToastMessageDispatch();
 	const { copy, hasCopied } = useClipboard(permalink);
+	const [selected, setSelected] = useState<Array<{ id: string, type: 'user' | 'channel' }>>([])
 
 	const { control, watch } = useForm({
 		defaultValues: {
@@ -33,23 +34,17 @@ const ShareMessageModal = ({ onClose, permalink, messages, enableCopy, onSuccess
 	});
 
 	const rooms = watch('rooms');
-	const sendMessage = useEndpoint('POST', '/v1/chat.postMessage');
+	const shareMessage = useEndpoint('POST', '/v1/chat.shareMessage');
 
-	const sendMessageMutation = useMutation({
+	const shareMessageMutation = useMutation({
 		mutationFn: async () => {
 			const optionalMessage = '';
 			const curMsg = await prependReplies(optionalMessage, messages);
 
-			return Promise.all(
-				rooms.map(async (roomId) => {
-					const sendPayload = {
-						roomId,
-						text: curMsg,
-					};
-
-					await sendMessage(sendPayload);
-				}),
-			);
+			return shareMessage({
+				message: curMsg,
+				selected,
+			})
 		},
 		onSuccess: () => {
 			dispatchToastMessage({ type: 'success', message: t('Message_has_been_shared') });
@@ -61,7 +56,7 @@ const ShareMessageModal = ({ onClose, permalink, messages, enableCopy, onSuccess
 		onSettled: () => {
 			onClose();
 		},
-	});
+	})
 
 	const attachments = useMemo(() => {
 		return messages?.map(m => {
@@ -99,7 +94,7 @@ const ShareMessageModal = ({ onClose, permalink, messages, enableCopy, onSuccess
 								name='rooms'
 								control={control}
 								render={({ field: { value, onChange } }): ReactElement => (
-									<UserAndRoomAutoCompleteMultiple value={value} onChange={onChange} />
+									<UserAndRoomAutoCompleteMultiple value={value} onChange={onChange} setSelected={setSelected} />
 								)}
 							/>
 						</Field.Row>
@@ -117,7 +112,7 @@ const ShareMessageModal = ({ onClose, permalink, messages, enableCopy, onSuccess
 							{hasCopied ? t('Copied') : t('Copy_Link')}
 						</Button>
 					}
-					<Button disabled={!rooms.length || sendMessageMutation.isLoading} onClick={() => sendMessageMutation.mutate()} primary>
+					<Button disabled={!rooms.length || shareMessageMutation.isLoading} onClick={() => shareMessageMutation.mutate()} primary>
 						{t('Share')}
 					</Button>
 				</ButtonGroup>
