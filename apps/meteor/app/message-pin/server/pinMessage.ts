@@ -8,7 +8,7 @@ import { Messages, Rooms, Subscriptions, Users } from '@rocket.chat/models';
 
 import { settings } from '../../settings/server';
 import { callbacks } from '../../../lib/callbacks';
-import { isTheLastMessage } from '../../lib/server';
+import { isTheLastMessage, sendMessage } from '../../lib/server';
 import { getUserAvatarURL } from '../../utils/lib/getUserAvatarURL';
 import { canAccessRoomAsync, roomAccessAttributes } from '../../authorization/server';
 import { hasPermissionAsync } from '../../authorization/server/functions/hasPermission';
@@ -130,16 +130,9 @@ Meteor.methods<ServerMethods>({
 		// App IPostMessagePinned event hook
 		await Apps.triggerEvent(AppEvents.IPostMessagePinned, originalMessage, await Meteor.userAsync(), originalMessage.pinned);
 
-		const msgId = await Message.saveSystemMessage('message_pinned', originalMessage.rid, '', me, {
-			attachments: [
-				{
-					text: originalMessage.msg,
-					author_name: originalMessage.u.username,
-					author_icon: getUserAvatarURL(originalMessage.u.username),
-					ts: originalMessage.ts,
-					attachments: attachments.map(recursiveRemove),
-				},
-			],
+		const msgId = await Message.saveSystemMessage('', originalMessage.rid, 'Сообщение закреплено', me, {
+			tshow: true,
+			tmid: originalMessage._id,
 		});
 
 		return Messages.findOneById(msgId);

@@ -82,6 +82,8 @@ const Toolbox = ({ message, messageContext, room, subscription }: ToolboxProps):
 		return null;
 	}
 
+	console.log('actionsQueryResult.data?.menu', actionsQueryResult.data?.menu);
+
 	return (
 		<MessageToolbox>
 			{actionsQueryResult.data?.message.map((action) => (

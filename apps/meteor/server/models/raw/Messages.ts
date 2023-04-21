@@ -1664,4 +1664,17 @@ export class MessagesRaw extends BaseRaw<IMessage> implements IMessagesModel {
 		};
 		return this.updateOne(query, update);
 	}
+
+	async deletePinMessagesNotification(originalMessageId: string) {
+		const query = {
+			tshow: true,
+			tmid: originalMessageId
+		}
+
+		const message = await this.findOne(query)
+
+		console.log('message for delete', message);
+
+		return this.deleteOne(query)
+	}
 }

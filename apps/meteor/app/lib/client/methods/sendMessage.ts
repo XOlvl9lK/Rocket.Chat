@@ -12,6 +12,7 @@ import { trim } from '../../../../lib/utils/stringUtils';
 
 Meteor.methods<ServerMethods>({
 	async sendMessage(message) {
+		console.log('message', message);
 		const uid = Meteor.userId();
 		if (!uid || trim(message.msg) === '') {
 			return false;
