@@ -23,6 +23,15 @@ class ChatMessageCollection
 	public declare _collection: MinimongoCollection<IMessage & { ignored?: boolean }>['_collection'];
 
 	public declare queries: MinimongoCollection<IMessage & { ignored?: boolean }>['queries'];
+
+	deletePinMessagesNotification(originalMessageId: string) {
+		const query = {
+			tshow: true,
+			tmid: originalMessageId
+		}
+
+		return this.remove(query)
+	}
 }
 
 /** @deprecated */
