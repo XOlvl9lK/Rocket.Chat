@@ -14,7 +14,7 @@ import {
 import { useTranslation, useUserPreference, useLayout } from '@rocket.chat/ui-contexts';
 import { useMutation } from '@tanstack/react-query';
 import type { MouseEventHandler, ReactElement, FormEvent, KeyboardEventHandler, KeyboardEvent, Ref, ClipboardEventHandler } from 'react';
-import React, { memo, useRef, useReducer, useCallback, useState } from 'react';
+import React, { memo, useRef, useReducer, useCallback, useState, useEffect } from 'react';
 import { useSubscription } from 'use-subscription';
 
 import { EmojiPicker } from '../../../../../../../app/emoji/client';
@@ -411,84 +411,81 @@ const MessageBox = ({
 			)}
 
 			{isRecordingVideo && <VideoMessageRecorder reference={messageComposerRef} rid={rid} tmid={tmid} />}
-			{isSelecting ?
-				<SelectedMessagesActions />
-				:
-				<MessageComposer ref={messageComposerRef} variant={isEditing ? 'editing' : undefined}>
-					{isRecordingAudio && <AudioMessageRecorder rid={rid} isMicrophoneDenied={isMicrophoneDenied} />}
-					<MessageComposerInput
-						ref={mergedRefs as unknown as Ref<HTMLInputElement>}
-						aria-label={t('Message')}
-						name='msg'
-						disabled={isRecording || !canSend}
-						onChange={setTyping}
-						style={textAreaStyle}
-						placeholder={t('Message')}
-						onKeyDown={handler}
-						onPaste={handlePaste}
-						aria-activedescendant={ariaActiveDescendant}
-						display={isEditor ? 'none' : 'block'}
-					/>
-					<MessageEditor ref={editorManager} isVisible={isEditor} />
-					<div ref={shadowRef} style={shadowStyle} />
-					<MessageComposerToolbar>
-						<MessageComposerToolbarActions aria-label={t('Message_composer_toolbox_primary_actions')}>
-							<MessageComposerAction
-								icon='arrow-expand'
-								onClick={toggleEditor}
-								title={t('Editor')}
-							/>
-							{!isEditor &&
-								<>
-									<MessageComposerAction
-										icon='emoji'
-										disabled={!useEmojis || isRecording || !canSend}
-										onClick={handleOpenEmojiPicker}
-										title={t('Emoji')}
-									/>
-									<MessageComposerActionsDivider />
-									{chat.composer && formatters.length > 0 && (
-										<MessageBoxFormattingToolbar
-											composer={chat.composer}
-											variant={sizes.inlineSize < 480 ? 'small' : 'large'}
-											items={formatters}
-											disabled={isRecording || !canSend}
-										/>
-									)}
-									<MessageComposerActionsDivider />
-									<MessageBoxActionsToolbar
-										variant={sizes.inlineSize < 480 ? 'small' : 'large'}
-										isRecording={isRecording}
-										typing={typing}
-										canSend={canSend}
-										rid={rid}
-										tmid={tmid}
-										isMicrophoneDenied={isMicrophoneDenied}
-									/>
-									<MessageComposerActionsDivider />
-								</>
-							}
-						</MessageComposerToolbarActions>
-						<MessageComposerToolbarSubmit>
-							{!canSend && (
-								<Button small primary onClick={onJoin} disabled={joinMutation.isLoading}>
-									{t('Join')}
-								</Button>
-							)}
-							{canSend && (
+			{isSelecting && <SelectedMessagesActions />}
+			<MessageComposer ref={messageComposerRef} variant={isEditing ? 'editing' : undefined} display={isSelecting ? 'none' : 'block'}>
+				{isRecordingAudio && <AudioMessageRecorder rid={rid} isMicrophoneDenied={isMicrophoneDenied} />}
+				<MessageComposerInput
+					ref={mergedRefs as unknown as Ref<HTMLInputElement>}
+					aria-label={t('Message')}
+					name='msg'
+					disabled={isRecording || !canSend}
+					onChange={setTyping}
+					style={textAreaStyle}
+					placeholder={t('Message')}
+					onKeyDown={handler}
+					onPaste={handlePaste}
+					aria-activedescendant={ariaActiveDescendant}
+					display={isEditor ? 'none' : 'block'}
+				/>
+				<MessageEditor ref={editorManager} isVisible={isEditor} />
+				<div ref={shadowRef} style={shadowStyle} />
+				<MessageComposerToolbar>
+					<MessageComposerToolbarActions aria-label={t('Message_composer_toolbox_primary_actions')}>
+						<MessageComposerAction
+							icon='arrow-expand'
+							onClick={toggleEditor}
+							title={t('Editor')}
+						/>
+						{!isEditor &&
+							<>
 								<MessageComposerAction
-									aria-label={t('Send')}
-									icon='send'
-									disabled={isEditor ? false : !canSend || (!typing && !isEditing)}
-									onClick={handleSendMessage}
-									secondary={typing || isEditing}
-									info={typing || isEditing}
+									icon='emoji'
+									disabled={!useEmojis || isRecording || !canSend}
+									onClick={handleOpenEmojiPicker}
+									title={t('Emoji')}
 								/>
-							)}
-						</MessageComposerToolbarSubmit>
-					</MessageComposerToolbar>
-				</MessageComposer>
-			}
+								<MessageComposerActionsDivider />
+								{chat.composer && formatters.length > 0 && (
+									<MessageBoxFormattingToolbar
+										composer={chat.composer}
+										variant={sizes.inlineSize < 480 ? 'small' : 'large'}
+										items={formatters}
+										disabled={isRecording || !canSend}
+									/>
+								)}
+								<MessageComposerActionsDivider />
+								<MessageBoxActionsToolbar
+									variant={sizes.inlineSize < 480 ? 'small' : 'large'}
+									isRecording={isRecording}
+									typing={typing}
+									canSend={canSend}
+									rid={rid}
+									tmid={tmid}
+									isMicrophoneDenied={isMicrophoneDenied}
+								/>
+								<MessageComposerActionsDivider />
+							</>
+						}
+					</MessageComposerToolbarActions>
+					<MessageComposerToolbarSubmit>
+						{!canSend && (
+							<Button small primary onClick={onJoin} disabled={joinMutation.isLoading}>
+								{t('Join')}
+							</Button>
+						)}
+						{canSend && (
+							<MessageComposerAction
+								aria-label={t('Send')}
+								icon='send'
+								disabled={isEditor ? false : !canSend || (!typing && !isEditing)}
+								onClick={handleSendMessage}
+								secondary={typing || isEditing}
+								info={typing || isEditing}
+							/>
+						)}
+					</MessageComposerToolbarSubmit>
+				</MessageComposerToolbar>
+			</MessageComposer>
 			<ComposerUserActionIndicator rid={rid} tmid={tmid} />
 		</>
 	);

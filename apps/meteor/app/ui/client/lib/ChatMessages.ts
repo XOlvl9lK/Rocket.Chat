@@ -107,7 +107,6 @@ export class ChatMessages implements ChatAPI {
 			setHighlightMessage(message._id);
 
 			if (message?.t === 'editor') {
-				console.log('this.editorManager', this.editorManager);
 				this.editorManager?.setContent?.(text)
 				this.editorManager?.openEditor()
 			} else {

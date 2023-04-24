@@ -8,6 +8,8 @@ import type { ComposerAPI } from '../../../../client/lib/chats/ChatAPI';
 import type { FormattingButton } from './messageBoxFormatting';
 import { formattingButtons } from './messageBoxFormatting';
 
+const listeners: { [key: string]: () => void } = {}
+
 export const createComposerAPI = (input: HTMLTextAreaElement, storageID: string): ComposerAPI => {
 	const triggerEvent = (input: HTMLTextAreaElement, evt: string): void => {
 		$(input).trigger(evt);
@@ -32,20 +34,26 @@ export const createComposerAPI = (input: HTMLTextAreaElement, storageID: string)
 
 	let _quotedMessages: IMessage[] = [];
 
-	const persist = withDebouncing({ wait: 300 })(() => {
+	const persist = () => {
 		if (input.value) {
 			Meteor._localStorage.setItem(storageID, input.value);
 			return;
 		}
 
 		Meteor._localStorage.removeItem(storageID);
-	});
+	}
 
 	const notifyQuotedMessagesUpdate = (): void => {
 		emitter.emit('quotedMessagesUpdate');
 	};
 
+	Object.values(listeners).forEach(listener => {
+		input.removeEventListener('input', listener)
+	})
+
 	input.addEventListener('input', persist);
+
+	listeners[storageID] = persist
 
 	const setText = (
 		text: string,
