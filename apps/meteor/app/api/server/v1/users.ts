@@ -144,6 +144,7 @@ API.v1.addRoute(
 	{ authRequired: true, validateParams: isUsersSetPreferencesParamsPOST },
 	{
 		async post() {
+			console.log(1);
 			if (
 				this.bodyParams.userId &&
 				this.bodyParams.userId !== this.userId &&
@@ -151,23 +152,28 @@ API.v1.addRoute(
 			) {
 				throw new Meteor.Error('error-action-not-allowed', 'Editing user is not allowed');
 			}
+			console.log(2);
 			const userId = this.bodyParams.userId ? this.bodyParams.userId : this.userId;
 			if (!(await Users.findOneById(userId))) {
 				throw new Meteor.Error('error-invalid-user', 'The optional "userId" param provided does not match any users');
 			}
+			console.log(3);
 
 			await Meteor.runAsUser(userId, () => Meteor.callAsync('saveUserPreferences', this.bodyParams.data));
+			console.log(4);
 			const user = await Users.findOneById(userId, {
 				projection: {
 					'settings.preferences': 1,
 					'language': 1,
 				},
 			});
+			console.log(5);
 
 			if (!user) {
 				return API.v1.failure('User not found');
 			}
 
+			console.log(6);
 			return API.v1.success({
 				user: {
 					_id: user._id,

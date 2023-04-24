@@ -13,6 +13,7 @@ type Values = {
 	newMessageNotification: string;
 	muteFocusedConversations: boolean;
 	notificationsSoundVolume: number;
+	newVideoConfNotification: string;
 };
 const useCustomSoundsOptions = (): SelectOption[] => useMemo(() => CustomSounds?.getList?.().map(({ _id, name }) => [_id, name]), []);
 
@@ -26,13 +27,14 @@ const PreferencesSoundSection = ({ onChange, commitRef, ...props }: FormSectionP
 		newMessageNotification: useUserPreference('newMessageNotification'),
 		muteFocusedConversations: useUserPreference('muteFocusedConversations'),
 		notificationsSoundVolume: useUserPreference('notificationsSoundVolume'),
+		newVideoConfNotification: useUserPreference('newVideoConfNotification'),
 	};
 
 	const { values, handlers, commit } = useForm(settings, onChange);
 
-	const { newRoomNotification, newMessageNotification, muteFocusedConversations, notificationsSoundVolume } = values as Values;
+	const { newRoomNotification, newMessageNotification, muteFocusedConversations, notificationsSoundVolume, newVideoConfNotification } = values as Values;
 
-	const { handleNewRoomNotification, handleNewMessageNotification, handleMuteFocusedConversations, handleNotificationsSoundVolume } =
+	const { handleNewRoomNotification, handleNewMessageNotification, handleMuteFocusedConversations, handleNotificationsSoundVolume, handleNewVideoConfNotification } =
 		handlers;
 
 	const onChangeNewRoomNotification = useCallback(
@@ -50,6 +52,14 @@ const PreferencesSoundSection = ({ onChange, commitRef, ...props }: FormSectionP
 		},
 		[handleNewMessageNotification, notificationsSoundVolume],
 	);
+
+	const onChangeNewVideoConfNotification = useCallback(
+		(value) => {
+			handleNewVideoConfNotification(value)
+			CustomSounds.play(value, { volume: notificationsSoundVolume / 100 })
+		},
+		[handleNewVideoConfNotification, notificationsSoundVolume]
+	)
 
 	const onChangeNotificationsSoundVolume = useCallback(
 		(e) => {
@@ -85,6 +95,17 @@ const PreferencesSoundSection = ({ onChange, commitRef, ...props }: FormSectionP
 						</Field>
 					),
 					[onChangeNewMessageNotification, newMessageNotification, soundsList, t],
+				)}
+				{useMemo(
+					() => (
+						<Field>
+							<Field.Label>{t('New_VideoConf_Notification')}</Field.Label>
+							<Field.Row>
+								<Select value={newVideoConfNotification} onChange={onChangeNewVideoConfNotification} options={soundsList} />
+							</Field.Row>
+						</Field>
+					),
+					[onChangeNewVideoConfNotification, newVideoConfNotification, soundsList, t],
 				)}
 				{useMemo(
 					() => (

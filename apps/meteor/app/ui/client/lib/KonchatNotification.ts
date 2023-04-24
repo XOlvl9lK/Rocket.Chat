@@ -210,6 +210,43 @@ class KonchatNotification {
 		}
 	}
 
+	public newVideoConf(rid: IRoom['_id'] | undefined) {
+		if ((Meteor.user() as IUser | null)?.status === 'busy') {
+			return;
+		}
+
+		const userId = Meteor.userId();
+		const newVideoConfNotification = getUserPreference<string>(userId, 'newVideoConfNotification');
+		const audioVolume = getUserPreference(userId, 'notificationsSoundVolume', 100);
+
+		if (!rid) {
+			return;
+		}
+
+		const sub = ChatSubscription.findOne({ rid }, { fields: { audioNotificationValue: 1 } });
+
+		if (!sub || sub.audioNotificationValue === 'none') {
+			return;
+		}
+
+		try {
+			if (sub.audioNotificationValue && sub.audioNotificationValue !== '0') {
+				CustomSounds.play(sub.audioNotificationValue, {
+					volume: Number((audioVolume / 100).toPrecision(2)),
+				});
+				return;
+			}
+
+			if (newVideoConfNotification !== 'none') {
+				CustomSounds.play(newVideoConfNotification, {
+					volume: Number((audioVolume / 100).toPrecision(2)),
+				});
+			}
+		} catch (e) {
+			// do nothing
+		}
+	}
+
 	public newRoom(rid: IRoom['_id']) {
 		Tracker.nonreactive(() => {
 			let newRoomSound = Session.get('newRoomSound') as IRoom['_id'][] | undefined;

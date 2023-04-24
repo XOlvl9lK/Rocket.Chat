@@ -531,6 +531,21 @@ void settingsRegistry.addGroup('Accounts', async function () {
 			public: true,
 			i18nLabel: 'New_Message_Notification',
 		});
+		await this.add('Accounts_Default_User_Preferences_newVideoConfNotification', 'dialtone', {
+			type: 'select',
+			values: [
+				{
+					key: 'none',
+					i18nLabel: 'None',
+				},
+				{
+					key: 'dialtone',
+					i18nLabel: 'Default',
+				},
+			],
+			public: true,
+			i18nLabel: 'New_VideoConf_Notification',
+		});
 
 		await this.add('Accounts_Default_User_Preferences_muteFocusedConversations', true, {
 			type: 'boolean',

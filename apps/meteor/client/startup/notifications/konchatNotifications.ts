@@ -41,6 +41,22 @@ function notifyNewMessageAudio(rid?: string): void {
 	}
 }
 
+function notifyNewVideoConfAudio(rid?: string) {
+	const hasFocus = readMessage.isEnable();
+	const messageIsInOpenedRoom = RoomManager.opened === rid;
+	const muteFocusedConversations = getUserPreference(Meteor.userId(), 'muteFocusedConversations');
+
+	if (isLayoutEmbedded()) {
+		if (!hasFocus && messageIsInOpenedRoom) {
+			// Play a notification sound
+			void KonchatNotification.newVideoConf(rid);
+		}
+	} else if (!hasFocus || !messageIsInOpenedRoom || !muteFocusedConversations) {
+		// Play a notification sound
+		void KonchatNotification.newVideoConf(rid);
+	}
+}
+
 Meteor.startup(() => {
 	Tracker.autorun(() => {
 		if (!Meteor.userId()) {
@@ -50,9 +66,12 @@ Meteor.startup(() => {
 		Notifications.onUser('notification', (notification: NotificationEvent) => {
 			const openedRoomId = ['channel', 'group', 'direct'].includes(FlowRouter.getRouteName()) ? RoomManager.opened : undefined;
 
+			console.log('notification.payload', notification.payload);
+
 			// This logic is duplicated in /client/startup/unread.coffee.
 			const hasFocus = readMessage.isEnable();
 			const messageIsInOpenedRoom = openedRoomId === notification.payload.rid;
+			const isVideoConf = notification.payload.message.t === 'videoconf'
 
 			fireGlobalEvent('notification', {
 				notification,
@@ -70,7 +89,11 @@ Meteor.startup(() => {
 				KonchatNotification.showDesktop(notification);
 			}
 
-			notifyNewMessageAudio(notification.payload.rid);
+			if (isVideoConf) {
+				notifyNewVideoConfAudio(notification.payload.rid)
+			} else {
+				notifyNewMessageAudio(notification.payload.rid);
+			}
 		});
 
 		CachedChatSubscription.on('changed', (sub): void => {

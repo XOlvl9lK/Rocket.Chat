@@ -9,6 +9,7 @@ export type UsersSetPreferencesParamsPOST = {
 	data: {
 		newRoomNotification?: string;
 		newMessageNotification?: string;
+		newVideoConfNotification?: string;
 		clockMode?: number;
 		useEmojis?: boolean;
 		convertAsciiEmoji?: boolean;
@@ -61,6 +62,10 @@ const UsersSetPreferencesParamsPostSchema = {
 					nullable: true,
 				},
 				newMessageNotification: {
+					type: 'string',
+					nullable: true,
+				},
+				newVideoConfNotification: {
 					type: 'string',
 					nullable: true,
 				},
