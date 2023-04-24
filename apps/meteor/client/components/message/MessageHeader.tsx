@@ -7,7 +7,7 @@ import {
 	MessageStatusPrivateIndicator,
 	MessageNameContainer,
 } from '@rocket.chat/fuselage';
-import { useTranslation } from '@rocket.chat/ui-contexts';
+import { useTranslation, useUser } from '@rocket.chat/ui-contexts';
 import type { ReactElement } from 'react';
 import React, { memo, useMemo } from 'react';
 
@@ -21,6 +21,7 @@ import StatusIndicators from './StatusIndicators';
 import MessageRoles from './header/MessageRoles';
 import { useMessageRoles } from './header/hooks/useMessageRoles';
 import { useMessageListShowUsername, useMessageListShowRealName, useMessageListShowRoles } from './list/MessageListContext';
+import { ChannelBadge } from './header/ChannelBadge';
 
 type MessageHeaderProps = {
 	message: IMessage;
@@ -29,6 +30,7 @@ type MessageHeaderProps = {
 
 const MessageHeader = ({ message, showChannel }: MessageHeaderProps): ReactElement => {
 	const t = useTranslation();
+	const viewer = useUser()
 
 	const formatTime = useFormatTime();
 	const formatDateAndTime = useFormatDateAndTime();
@@ -44,7 +46,15 @@ const MessageHeader = ({ message, showChannel }: MessageHeaderProps): ReactEleme
 
 	const chat = useChat();
 
-	const isChannel = useMemo(() => !!message?.r?.name, [message])
+	const channelTitle = useMemo(() => {
+		if (message?.r?.name) {
+			return message.r.name;
+		}
+		if (message?.r?.usernames?.length) {
+			return message.r.usernames.find(u => u !== viewer.username) || message.r.usernames[0];
+		}
+		return '';
+	}, [message]);
 
 	return (
 		<FuselageMessageHeader>
@@ -59,7 +69,6 @@ const MessageHeader = ({ message, showChannel }: MessageHeaderProps): ReactEleme
 							style: { cursor: 'pointer' },
 						})}
 				>
-					{showChannel && isChannel && `${message?.r?.name}:`}
 					{message.alias || getUserDisplayName(user.name, user.username, showRealName)}
 				</MessageName>
 				{showUsername && (
@@ -80,6 +89,7 @@ const MessageHeader = ({ message, showChannel }: MessageHeaderProps): ReactEleme
 				)}
 			</MessageNameContainer>
 
+			{showChannel && <ChannelBadge title={channelTitle} />}
 			{shouldShowRolesList && <MessageRoles roles={roles} isBot={message.bot} />}
 			<MessageTimestamp title={formatDateAndTime(message.ts)}>{formatDateAndTime(message.ts)}</MessageTimestamp>
 			{message.private && <MessageStatusPrivateIndicator>{t('Only_you_can_see_this_message')}</MessageStatusPrivateIndicator>}

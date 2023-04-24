@@ -53,7 +53,7 @@ export class SearchResultValidationService {
 								return {
 									...msg,
 									user: msg.u._id,
-									r: { name: subscription.name, t: subscription.t },
+									r: { name: subscription.name, t: subscription.t, usernames: subscription.usernames },
 									username: user?.username,
 									valid: true,
 								};

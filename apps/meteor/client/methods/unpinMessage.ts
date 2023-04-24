@@ -8,7 +8,7 @@ import { t } from '../../app/utils/client';
 import { dispatchToastMessage } from '../lib/toast';
 
 Meteor.methods<ServerMethods>({
-	unpinMessage(message: IMessage) {
+	async unpinMessage(message: IMessage) {
 		if (!Meteor.userId()) {
 			dispatchToastMessage({ type: 'error', message: t('error-not-authorized') });
 			return false;
@@ -37,6 +37,8 @@ Meteor.methods<ServerMethods>({
 				},
 			},
 		);
+
+		ChatMessage.deletePinMessagesNotification(message._id);
 
 		return true;
 	},
