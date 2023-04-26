@@ -77,8 +77,6 @@ Meteor.methods<ServerMethods>({
 			};
 		}
 
-		console.log('query', query);
-
 		return {
 			message: {
 				docs: await Messages.find(query, {
