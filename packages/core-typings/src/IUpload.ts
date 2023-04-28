@@ -3,6 +3,7 @@ export interface IUpload {
 	typeGroup?: string;
 	description?: string;
 	type?: string;
+	fileContent?: string;
 	name?: string;
 	aliases?: string;
 	extension?: string;

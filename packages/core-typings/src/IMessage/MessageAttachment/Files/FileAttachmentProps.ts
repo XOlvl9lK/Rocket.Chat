@@ -5,6 +5,7 @@ import type { VideoAttachmentProps } from './VideoAttachmentProps';
 
 export type FileAttachmentProps = {
 	type: 'file';
+	fileContent?: string;
 } & (VideoAttachmentProps | ImageAttachmentProps | AudioAttachmentProps);
 
 export const isFileAttachment = (attachment: MessageAttachmentBase): attachment is FileAttachmentProps =>

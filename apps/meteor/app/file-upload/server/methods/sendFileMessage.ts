@@ -113,6 +113,7 @@ export const parseFileIntoMessageAttachments = async (
 			title_link: fileUrl,
 			title_link_download: true,
 			size: file.size as number,
+			...(file.fileContent ? { fileContent: file.fileContent} : {}),
 		};
 		attachments.push(attachment);
 	}
