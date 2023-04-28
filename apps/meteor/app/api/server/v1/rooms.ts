@@ -23,6 +23,7 @@ import {
 import * as dataExport from '../../../../server/lib/dataExport';
 import { composeRoomWithLastMessage } from '../helpers/composeRoomWithLastMessage';
 import { getPaginationItems } from '../helpers/getPaginationItems';
+import { getContentParser } from '../lib/contentParser';
 
 async function findRoomByIdOrName({
 	params,
@@ -172,6 +173,7 @@ API.v1.addRoute(
 			const uploadedFile = await fileStore.insert(details, fileBuffer);
 
 			uploadedFile.description = fields.description;
+			uploadedFile.fileContent = await getContentParser(uploadedFile.type, fileBuffer).parse()
 
 			delete fields.description;
 
