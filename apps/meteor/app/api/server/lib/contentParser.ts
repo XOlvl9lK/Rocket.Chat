@@ -1,6 +1,6 @@
 const pdf = require('pdf-parse');
 const officeParser = require('officeparser');
-const textract = require('textract');
+import { read, utils } from 'xlsx';
 
 interface IContentParser {
 	fileBuffer: Buffer
@@ -32,26 +32,59 @@ class OfficeContentParser implements IContentParser {
 	}
 }
 
-export const getContentParser = (type: string, fileBuffer: Buffer): IContentParser => {
+class XlsContentParser implements IContentParser {
+	constructor(private fileBuffer: Buffer) {}
 
-	switch (type) {
-		case 'text/plain':
-		case 'text/cmd':
-		case 'text/css':
-		case 'text/csv':
-		case 'text/html':
-		case 'text/xml':
-		case 'application/json':
-			return new TextContentParser(fileBuffer)
-		case 'application/pdf':
-			return new PdfContentParser(fileBuffer)
-		case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-		case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-			return new OfficeContentParser(fileBuffer)
-		default:
-			return {
-				fileBuffer,
-				parse: async () => ''
-			}
+	private readBuffer() {
+		return read(this.fileBuffer, { type: 'buffer' })
 	}
+
+	async parse() {
+		const wb = this.readBuffer()
+		let content = ''
+		Object.values(wb.Sheets).forEach(worksheet => {
+			Object.entries(worksheet).forEach(([key, value]) => {
+				if (!key.includes('!')) {
+					content += ` ${value.v}`
+				}
+			})
+		})
+		return content
+	}
+}
+
+class FakeContentParser implements IContentParser {
+	constructor(private fileBuffer: Buffer) {}
+
+	async parse() {
+		return ''
+	}
+}
+
+export const getContentParser = (type: string, fileBuffer: Buffer): IContentParser => {
+	const getParserConstructor = (): new (fileBuffer: Buffer) => IContentParser => {
+		switch (type) {
+			case 'text/plain':
+			case 'text/cmd':
+			case 'text/css':
+			case 'text/csv':
+			case 'text/html':
+			case 'text/xml':
+			case 'application/json':
+				return TextContentParser
+			case 'application/pdf':
+				return PdfContentParser
+			case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+			case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+				return OfficeContentParser
+			case 'application/vnd.ms-excel':
+				return XlsContentParser
+			default:
+				return FakeContentParser
+		}
+	}
+
+	const constructor = getParserConstructor()
+
+	return new constructor(fileBuffer)
 }
