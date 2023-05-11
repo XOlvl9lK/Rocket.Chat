@@ -151,6 +151,14 @@ class PushClass {
 			return;
 		}
 
+		logger.log('Error in sendGatewayPush')
+		logger.log('gateway', gateway)
+		logger.log('service', service)
+		logger.log('token', token)
+		logger.log('notification', notification)
+		logger.log('fetch result', result)
+		logger.log('fetch response', response)
+		logger.log('-------------------------')
 		logger.error({ msg: `Error sending push to gateway (${tries} try) ->`, err: response });
 
 		if (tries <= 4) {
