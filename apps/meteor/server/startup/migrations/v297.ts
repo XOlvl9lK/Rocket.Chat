@@ -40,6 +40,7 @@ addMigration({
 						if (fileBuffer) {
 							console.log('is buffer found', !!fileBuffer);
 							attachment.fileContent = await getContentParser(file.type, fileBuffer).parse()
+							console.log('content parsed');
 							await messageModel.updateOne({ _id: message._id }, { $set: { attachments }})
 						}
 					}
