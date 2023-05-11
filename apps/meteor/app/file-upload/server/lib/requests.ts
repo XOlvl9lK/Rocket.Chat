@@ -5,7 +5,7 @@ import { FileUpload } from './FileUpload';
 
 WebApp.connectHandlers.use(FileUpload.getPath(), async function (req, res, next) {
 	const match = /^\/([^\/]+)\/(.*)/.exec(req.url || '');
-	console.log('req.url', req.url);
+
 	if (match?.[1]) {
 		const file = await Uploads.findOneById(match[1]);
 
