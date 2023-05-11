@@ -23,9 +23,10 @@ addMigration({
 
 		const messages = await messageModel.find({ attachments: { $elemMatch: { type: 'file' }}}).toArray()
 
-		console.log('start reindex messages');
+		console.log('start reindex messages, total', messages.length);
 		for (let i = 0; i < messages.length; i++) {
 			const message = messages[i]
+			console.log('message', message._id);
 			const attachments = message.attachments
 			for (let j = 0; j < attachments; j++) {
 				const attachment = attachments[j]
