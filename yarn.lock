@@ -10995,7 +10995,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^18, @types/react-dom@npm:^18.0.0":
+"@types/react-dom@npm:^18":
   version: 18.0.10
   resolution: "@types/react-dom@npm:18.0.10"
   dependencies:
@@ -26048,7 +26048,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"meow@npm:3.7.0, meow@npm:^3.1.0, meow@npm:^3.3.0":
+"meow@npm:3.7.0, meow@npm:^3.1.0":
   version: 3.7.0
   resolution: "meow@npm:3.7.0"
   dependencies:
@@ -26083,24 +26083,6 @@ __metadata:
     type-fest: ^1.2.2
     yargs-parser: ^20.2.9
   checksum: 1ea19df7d6d5b160219d928937db247092ed2deada71923558487ce2d06b215b1bc8378e8bc28c9784dcdc4089b186e1a1409193d533b7f4764827f087370bda
-  languageName: node
-  linkType: hard
-
-"meow@npm:^3.1.0":
-  version: 3.7.0
-  resolution: "meow@npm:3.7.0"
-  dependencies:
-    camelcase-keys: ^2.0.0
-    decamelize: ^1.1.2
-    loud-rejection: ^1.0.0
-    map-obj: ^1.0.1
-    minimist: ^1.1.3
-    normalize-package-data: ^2.3.4
-    object-assign: ^4.0.1
-    read-pkg-up: ^1.0.1
-    redent: ^1.0.0
-    trim-newlines: ^1.0.0
-  checksum: 65a412e5d0d643615508007a9292799bb3e4e690597d54c9e98eb0ca3adb7b8ca8899f41ea7cb7d8277129cdcd9a1a60202b31f88e0034e6aaae02894d80999a
   languageName: node
   linkType: hard
 
@@ -33711,17 +33693,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"squeak@npm:^1.0.0":
-  version: 1.3.0
-  resolution: "squeak@npm:1.3.0"
-  dependencies:
-    chalk: ^1.0.0
-    console-stream: ^0.1.1
-    lpad-align: ^1.0.1
-  checksum: 6a3c02cb5a75d3bbddbb9fe8940999e40b06060f35960867bccc61e5f2459ac6428c7b214b2776b36b0122140abad7e26aba6e42858bcf44fbff3a0fc7971fa2
-  languageName: node
-  linkType: hard
-
 "ssf@npm:0.8.2, ssf@npm:~0.8.1":
   version: 0.8.2
   resolution: "ssf@npm:0.8.2"
@@ -37864,7 +37835,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"xml2js@npm:0.5.0, xml2js@npm:~0.5.0":
+"xml2js@npm:0.5.0, xml2js@npm:^0.5.0, xml2js@npm:~0.5.0":
   version: 0.5.0
   resolution: "xml2js@npm:0.5.0"
   dependencies:
@@ -37874,13 +37845,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"xml2js@npm:^0.5.0":
-  version: 0.5.0
-  resolution: "xml2js@npm:0.5.0"
+"xml2js@npm:^0.4.4":
+  version: 0.4.23
+  resolution: "xml2js@npm:0.4.23"
   dependencies:
     sax: ">=0.6.0"
     xmlbuilder: ~11.0.0
-  checksum: 1aa71d62e5bc2d89138e3929b9ea46459157727759cbc62ef99484b778641c0cd21fb637696c052d901a22f82d092a3e740a16b4ce218e81ac59b933535124ea
+  checksum: ca0cf2dfbf6deeaae878a891c8fbc0db6fd04398087084edf143cdc83d0509ad0fe199b890f62f39c4415cf60268a27a6aed0d343f0658f8779bd7add690fa98
   languageName: node
   linkType: hard
 

@@ -9,6 +9,7 @@ interface IContentParser {
 
 abstract class ContentParser implements IContentParser {
 	protected readonly MAX_CONTENT_MBYTES_LENGTH = 2
+	protected readonly MAX_MBYTES_FILE_SIZE = 50
 
 	protected constructor(public fileBuffer: Buffer) {}
 
@@ -16,14 +17,14 @@ abstract class ContentParser implements IContentParser {
 
 	async parse() {
 		if (this.isFileTooLarge()) return ''
-		const content = await this.getContent()
+		const content = (await this.getContent()) as string
 		const mByteLength = this.toMBytes(Buffer.byteLength(content, 'utf8'))
 		if (mByteLength > this.MAX_CONTENT_MBYTES_LENGTH) return ''
 		return content
 	}
 
 	protected isFileTooLarge() {
-		return this.toMBytes(this.fileBuffer) > 100
+		return this.toMBytes(this.fileBuffer.length) > this.MAX_MBYTES_FILE_SIZE
 	}
 
 	protected toMBytes(bytes: number) {
