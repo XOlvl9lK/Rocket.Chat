@@ -29,8 +29,9 @@ addMigration({
 			console.log(`message №${i} `, message._id);
 			const attachments = message.attachments
 			console.log('attachments length', attachments.length);
-			for (let j = 0; j < attachments; j++) {
+			for (let j = 0; j < attachments.length; j++) {
 				const attachment = attachments[j]
+				console.log('attachment', attachment);
 				const titleLink = attachment?.title_link?.replace('/file-upload', '')
 				console.log('titleLink', titleLink);
 				const match = /^\/([^\/]+)\/(.*)/.exec(titleLink || '');
