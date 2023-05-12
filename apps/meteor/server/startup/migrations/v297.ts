@@ -26,8 +26,9 @@ addMigration({
 		console.log('start reindex messages, total', messages.length);
 		for (let i = 0; i < messages.length; i++) {
 			const message = messages[i]
-			console.log('message', message._id);
+			console.log(`message №${i} `, message._id);
 			const attachments = message.attachments
+			console.log('attachments length', attachments.length);
 			for (let j = 0; j < attachments; j++) {
 				const attachment = attachments[j]
 				const titleLink = attachment?.title_link?.replace('/file-upload', '')

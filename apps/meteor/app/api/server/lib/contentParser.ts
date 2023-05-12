@@ -7,39 +7,71 @@ interface IContentParser {
 	parse: () => Promise<string>
 }
 
-class TextContentParser implements IContentParser {
-	constructor(private fileBuffer: Buffer) {}
+abstract class ContentParser implements IContentParser {
+	protected readonly MAX_CONTENT_MBYTES_LENGTH = 2
+
+	protected constructor(public fileBuffer: Buffer) {}
+
+	abstract getContent(): Promise<string> | string
 
 	async parse() {
+		if (this.isFileTooLarge()) return ''
+		const content = await this.getContent()
+		const mByteLength = this.toMBytes(Buffer.byteLength(content, 'utf8'))
+		if (mByteLength > this.MAX_CONTENT_MBYTES_LENGTH) return ''
+		return content
+	}
+
+	protected isFileTooLarge() {
+		return this.toMBytes(this.fileBuffer) > 100
+	}
+
+	protected toMBytes(bytes: number) {
+		return (bytes / 1024) / 1024
+	}
+}
+
+class TextContentParser extends ContentParser {
+	constructor(fileBuffer: Buffer) {
+		super(fileBuffer)
+	}
+
+	async getContent() {
 		return this.fileBuffer.toString()
 	}
 }
 
-class PdfContentParser implements IContentParser {
-	constructor(private fileBuffer: Buffer) {}
+class PdfContentParser extends ContentParser {
+	constructor(fileBuffer: Buffer) {
+		super(fileBuffer)
+	}
 
-	async parse() {
+	async getContent() {
 		const data = await pdf(this.fileBuffer)
 		return data.text
 	}
 }
 
-class OfficeContentParser implements IContentParser {
-	constructor(private fileBuffer: Buffer) {}
+class OfficeContentParser extends ContentParser {
+	constructor(fileBuffer: Buffer) {
+		super(fileBuffer)
+	}
 
-	async parse() {
+	async getContent() {
 		return officeParser.parseOfficeAsync(this.fileBuffer)
 	}
 }
 
-class XlsContentParser implements IContentParser {
-	constructor(private fileBuffer: Buffer) {}
+class XlsContentParser extends ContentParser {
+	constructor(fileBuffer: Buffer) {
+		super(fileBuffer)
+	}
 
 	private readBuffer() {
 		return read(this.fileBuffer, { type: 'buffer' })
 	}
 
-	async parse() {
+	async getContent() {
 		const wb = this.readBuffer()
 		let content = ''
 		Object.values(wb.Sheets).forEach(worksheet => {
@@ -53,10 +85,12 @@ class XlsContentParser implements IContentParser {
 	}
 }
 
-class FakeContentParser implements IContentParser {
-	constructor(private fileBuffer: Buffer) {}
+class FakeContentParser extends ContentParser {
+	constructor(fileBuffer: Buffer) {
+		super(fileBuffer)
+	}
 
-	async parse() {
+	async getContent() {
 		return ''
 	}
 }
