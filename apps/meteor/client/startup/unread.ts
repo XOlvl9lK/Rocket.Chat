@@ -27,6 +27,9 @@ const fetchSubscriptions = (): ISubscription[] =>
 				unreadAlert: 1,
 				fname: 1,
 				prid: 1,
+				tunread: 1,
+				userMentions: 1,
+				groupMentions: 1
 			},
 		},
 	).fetch();
@@ -37,28 +40,35 @@ Meteor.startup(() => {
 
 		let unreadAlert: false | '•' = false;
 
-		const unreadCount = fetchSubscriptions().reduce(
-			(ret, subscription) =>
-				Tracker.nonreactive(() => {
-					const room = ChatRoom.findOne({ _id: subscription.rid }, { fields: { usersCount: 1 } });
-					fireGlobalEvent('unread-changed-by-subscription', {
-						...subscription,
-						usersCount: room?.usersCount,
-					});
+		const subscriptions = fetchSubscriptions()
 
-					if (subscription.alert || subscription.unread > 0) {
-						// Increment the total unread count.
-						if (subscription.alert === true && subscription.unreadAlert !== 'nothing') {
-							if (subscription.unreadAlert === 'all' || userUnreadAlert !== false) {
-								unreadAlert = '•';
-							}
+		const unreadCount = subscriptions.reduce<number>((count, subscription) =>
+			Tracker.nonreactive(() => {
+				const room = ChatRoom.findOne({ _id: subscription.rid }, { fields: { usersCount: 1 } });
+				fireGlobalEvent('unread-changed-by-subscription', {
+					...subscription,
+					usersCount: room?.usersCount,
+				});
+				if (subscription.alert || subscription.unread > 0) {
+					if (subscription.alert === true && subscription.unreadAlert !== 'nothing') {
+						if (subscription.unreadAlert === 'all' || userUnreadAlert !== false) {
+							unreadAlert = '•';
 						}
-						return ret + subscription.unread;
 					}
-					return ret;
-				}),
-			0,
-		);
+				}
+
+				if (subscription.t === 'd') {
+					if (subscription.unread > 0 || subscription.tunread?.length > 0) {
+						return count + 1
+					}
+				} else {
+					if (subscription.userMentions > 0 || subscription.groupMentions > 0 || subscription.tunread?.length > 0) {
+						return count + 1
+					}
+				}
+
+				return count
+			}), 0)
 
 		if (unreadCount > 0) {
 			if (unreadCount > 999) {

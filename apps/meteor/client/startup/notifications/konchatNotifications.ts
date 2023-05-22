@@ -66,8 +66,6 @@ Meteor.startup(() => {
 		Notifications.onUser('notification', (notification: NotificationEvent) => {
 			const openedRoomId = ['channel', 'group', 'direct'].includes(FlowRouter.getRouteName()) ? RoomManager.opened : undefined;
 
-			console.log('notification.payload', notification.payload);
-
 			// This logic is duplicated in /client/startup/unread.coffee.
 			const hasFocus = readMessage.isEnable();
 			const messageIsInOpenedRoom = openedRoomId === notification.payload.rid;
