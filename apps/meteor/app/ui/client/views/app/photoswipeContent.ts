@@ -104,6 +104,8 @@ const defaultGalleryOptions = {
 	counterEl: false,
 	index: 0,
 	wheelToZoom: true,
+	closeOnScroll: false,
+	clickToCloseNonZoomable: false,
 	padding: { top: 20, bottom: 40, left: 100, right: 100 },
 	addCaptionHTMLFn(item: Slide, captionEl: HTMLElement): boolean {
 		captionEl.children[0].innerHTML = `
