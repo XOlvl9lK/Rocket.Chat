@@ -106,22 +106,8 @@ const ThreadChat = ({ mainMessage }: ThreadChatProps) => {
 					onNavigateToPreviousMessage={handleNavigateToPreviousMessage}
 					onNavigateToNextMessage={handleNavigateToNextMessage}
 					onUploadFiles={handleUploadFiles}
-					tshow={sendToChannel}
-				>
-					<Field>
-						<Field.Row marginBlock={8}>
-							<CheckBox
-								id={sendToChannelID}
-								checked={sendToChannel}
-								onChange={() => setSendToChannel((checked) => !checked)}
-								name='alsoSendThreadToChannel'
-							/>
-							<Field.Label htmlFor={sendToChannelID} color='annotation' fontScale='p2'>
-								{t('Also_send_to_channel')}
-							</Field.Label>
-						</Field.Row>
-					</Field>
-				</ComposerContainer>
+					tshow
+				/>
 			</Box>
 		</VerticalBarContent>
 	);

@@ -289,19 +289,23 @@ export abstract class Streamer extends EventEmitter implements IStreamer {
 		args: any[],
 		getMsg: string | TransformMessage,
 	): Promise<void> {
-		subscriptions.forEach(async (subscription) => {
-			if (this.retransmitToSelf === false && origin && origin === subscription.subscription.connection) {
-				return;
-			}
-
-			const allowed = await this.isEmitAllowed(subscription.subscription, eventName, ...args);
-			if (allowed) {
-				const msg = typeof getMsg === 'string' ? getMsg : getMsg(this, subscription, eventName, args, allowed);
-				if (msg) {
-					subscription.subscription._session.socket?.send(msg);
+		try {
+			subscriptions.forEach(async (subscription) => {
+				if (this.retransmitToSelf === false && origin && origin === subscription.subscription.connection) {
+					return;
 				}
-			}
-		});
+
+				const allowed = await this.isEmitAllowed(subscription.subscription, eventName, ...args);
+				if (allowed) {
+					const msg = typeof getMsg === 'string' ? getMsg : getMsg(this, subscription, eventName, args, allowed);
+					if (msg) {
+						subscription.subscription._session.socket?.send(msg);
+					}
+				}
+			});
+		} catch (e) {
+			SystemLogger.error(`sendToManySubscriptions eventName: ${eventName}, error: ${JSON.stringify(e)}`);
+		}
 	}
 
 	emit(eventName: string | symbol, ...args: any[]): boolean {

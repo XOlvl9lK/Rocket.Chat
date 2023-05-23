@@ -10,6 +10,7 @@ import { hasPermissionAsync } from '../../../authorization/server/functions/hasP
 import { parseUrlsInMessage } from './parseUrlsInMessage';
 import { isRelativeURL } from '../../../../lib/utils/isRelativeURL';
 import notifications from '../../../notifications/server/lib/Notifications';
+import { SystemLogger } from '/server/lib/logger/system';
 
 /**
  * IMPORTANT
@@ -195,6 +196,10 @@ export const prepareMessageObject = function (message, rid, user) {
 	}
 };
 
+export const actualizeThread = async (message) => {
+	await Messages.updateMany({ tmid: message.tmid }, { $set: { tshow: false }})
+}
+
 /**
  * Clean up the message object before saving on db
  * @param {IMessage} message
@@ -237,7 +242,7 @@ export const sendMessage = async function (user, message, room, upsert = false) 
 	cleanupMessageObject(message);
 
 	parseUrlsInMessage(message);
-
+	SystemLogger.error(`sendMessage function before save message ${new Date().toISOString()}`);
 	message = callbacks.run('beforeSaveMessage', message, room);
 	if (message) {
 		if (message.t === 'otr') {
@@ -260,6 +265,9 @@ export const sendMessage = async function (user, message, room, upsert = false) 
 			if (messageAlreadyExists) {
 				return;
 			}
+			if (message.tmid) {
+				await actualizeThread(message)
+			}
 			const result = await Messages.insertOne(message);
 			message._id = result.insertedId;
 		}
@@ -269,6 +277,7 @@ export const sendMessage = async function (user, message, room, upsert = false) 
 			// so, we don't really care if it is successful or fails
 			void Apps.getBridges()?.getListenerBridge().messageEvent('IPostMessageSent', message);
 		}
+		SystemLogger.error(`sendMessage function message saved ${new Date().toISOString()}`);
 
 		/*
 		Defer other updates as their return is not interesting to the user
@@ -276,6 +285,7 @@ export const sendMessage = async function (user, message, room, upsert = false) 
 
 		// Execute all callbacks
 		callbacks.runAsync('afterSaveMessage', message, room);
+		SystemLogger.error(`sendMessage function after save message ${new Date().toISOString()}`);
 		return message;
 	}
 };

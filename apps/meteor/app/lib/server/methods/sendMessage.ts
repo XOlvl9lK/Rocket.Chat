@@ -82,6 +82,7 @@ export async function executeSendMessage(uid: IUser['_id'], message: AtLeast<IMe
 		const room = await canSendMessageAsync(rid, { uid, username: user.username, type: user.type });
 
 		metrics.messagesSent.inc(); // TODO This line needs to be moved to it's proper place. See the comments on: https://github.com/RocketChat/Rocket.Chat/pull/5736
+		SystemLogger.error(`executeSendMessage function ${new Date().toISOString()}`);
 		return sendMessage(user, message, room, false);
 	} catch (err: any) {
 		SystemLogger.error({ msg: 'Error sending message:', err });
@@ -117,9 +118,11 @@ Meteor.methods<ServerMethods>({
 			});
 		}
 
+		SystemLogger.error(`sendMessage method ${new Date().toISOString()}`);
 		try {
 			return executeSendMessage(uid, message);
 		} catch (error: any) {
+			SystemLogger.error(`Error when sending message: ${JSON.stringify(error)}`)
 			if ((error.error || error.message) === 'error-not-allowed') {
 				throw new Meteor.Error(error.error || error.message, error.reason, {
 					method: 'sendMessage',
