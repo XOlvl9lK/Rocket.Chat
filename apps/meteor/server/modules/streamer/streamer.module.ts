@@ -290,7 +290,9 @@ export abstract class Streamer extends EventEmitter implements IStreamer {
 		getMsg: string | TransformMessage,
 	): Promise<void> {
 		try {
-			subscriptions.forEach(async (subscription) => {
+			const subscriptionsArray = Array.from(subscriptions)
+			for (let i = 0; i < subscriptionsArray.length; i++) {
+				const subscription = subscriptionsArray[i]
 				if (this.retransmitToSelf === false && origin && origin === subscription.subscription.connection) {
 					return;
 				}
@@ -299,10 +301,26 @@ export abstract class Streamer extends EventEmitter implements IStreamer {
 				if (allowed) {
 					const msg = typeof getMsg === 'string' ? getMsg : getMsg(this, subscription, eventName, args, allowed);
 					if (msg) {
-						subscription.subscription._session.socket?.send(msg);
+						await subscription.subscription._session.socket?.send(msg);
 					}
 				}
-			});
+			}
+			if (eventName.includes('notification')) {
+				SystemLogger.error(`sendToManySubscriptions event notification successfully sent message ${JSON.stringify(args)}`)
+			}
+			// subscriptions.forEach(async (subscription) => {
+			// 	if (this.retransmitToSelf === false && origin && origin === subscription.subscription.connection) {
+			// 		return;
+			// 	}
+			//
+			// 	const allowed = await this.isEmitAllowed(subscription.subscription, eventName, ...args);
+			// 	if (allowed) {
+			// 		const msg = typeof getMsg === 'string' ? getMsg : getMsg(this, subscription, eventName, args, allowed);
+			// 		if (msg) {
+			// 			subscription.subscription._session.socket?.send(msg);
+			// 		}
+			// 	}
+			// });
 		} catch (e) {
 			SystemLogger.error(`sendToManySubscriptions eventName: ${eventName}, error: ${JSON.stringify(e)}`);
 		}

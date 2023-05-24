@@ -1,6 +1,8 @@
 import type * as MessageParser from '@rocket.chat/message-parser';
 import hljs from 'highlight.js';
-import { Fragment, ReactElement, useContext, useLayoutEffect, useMemo, useRef } from 'react';
+import { Fragment, ReactElement, useContext, useLayoutEffect, useMemo, useRef, useState, useCallback } from 'react';
+import { Collapse } from 'react-collapse';
+import { IconButton } from '@rocket.chat/fuselage';
 
 import { MarkupInteractionContext } from '../MarkupInteractionContext';
 
@@ -10,7 +12,8 @@ type CodeBlockProps = {
 };
 
 const CodeBlock = ({ lines = [], language }: CodeBlockProps): ReactElement => {
-	const ref = useRef<HTMLElement>(null);
+	const ref = useRef<HTMLElement | null>(null);
+	const [isOpened, setIsOpened] = useState(() => lines.length < 15)
 
 	const { highlightRegex } = useContext(MarkupInteractionContext);
 
@@ -57,19 +60,48 @@ const CodeBlock = ({ lines = [], language }: CodeBlockProps): ReactElement => {
 		}
 	}, [language, content]);
 
+	const toggle = useCallback(() => setIsOpened(prev => !prev), [])
+
 	return (
-		<pre role='region'>
-			<span className='copyonly'>```</span>
-			<code
-				key={language + code}
-				ref={ref}
-				className={((!language || language === 'none') && 'code-colors') || `code-colors language-${language}`}
-			>
-				{content}
-			</code>
-			<span className='copyonly'>```</span>
-		</pre>
+		<Collapse isOpened={isOpened}>
+			<ExpandIcon onClick={toggle} isOpened={isOpened} />
+			<pre role='region'>
+				<span className='copyonly'>```</span>
+				<code
+					key={language + code}
+					ref={ref}
+					className={((!language || language === 'none') && 'code-colors') || `code-colors language-${language}`}
+				>
+					{content}
+				</code>
+				<span className='copyonly'>```</span>
+			</pre>
+			{!isOpened && <div className='translucent' />}
+		</Collapse>
 	);
 };
 
 export default CodeBlock;
+
+type ExpandIconProps = {
+	isOpened: boolean
+	onClick: () => void
+}
+
+const ExpandIcon = ({ onClick, isOpened }: ExpandIconProps) => {
+	return <div className='expander'>
+		<IconButton
+			icon={isOpened ? 'chevron-up' : 'chevron-down'}
+			size='24px'
+			title={isOpened ? 'Свернуть' : 'Развернуть'}
+			onClick={onClick}
+			color='hint'
+			small
+			display='flex'
+			justifyContent='center'
+			alignItems='center'
+			overflow='hidden'
+			mie='12px'
+		/>
+	</div>
+}

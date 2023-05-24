@@ -28,6 +28,7 @@
 		"@types/jest": "~29.5.0",
 		"@types/katex": "~0",
 		"@types/react": "~17.0.57",
+		"@types/react-collapse": "^5.0.1",
 		"@types/react-dom": "~17.0.17",
 		"@types/testing-library__jest-dom": "~5.14.5",
 		"@typescript-eslint/eslint-plugin": "^5.30.7",
@@ -75,6 +76,7 @@
 	},
 	"dependencies": {
 		"highlight.js": "^11.5.1",
+		"react-collapse": "^5.1.1",
 		"react-error-boundary": "^3.1.4"
 	},
 	"volta": {

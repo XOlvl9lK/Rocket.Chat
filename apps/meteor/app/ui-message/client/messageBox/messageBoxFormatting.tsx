@@ -1,8 +1,13 @@
 import type { Icon } from '@rocket.chat/fuselage';
 import type { TranslationKey } from '@rocket.chat/ui-contexts';
-import type { ComponentProps } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
+import React from 'react';
 
 import { settings } from '../../../settings/client';
+import { ComposerAPI } from '/client/lib/chats/ChatAPI';
+import {
+	MultilineActionsToolbarDropdown
+} from '/client/views/room/components/body/composer/messageBox/MessageBoxActionsToolbar/MultilineActionsToolbarDropdown';
 
 export type FormattingButton =
 	| {
@@ -19,7 +24,12 @@ export type FormattingButton =
 			text: () => string | undefined;
 			link: string;
 			condition?: () => boolean;
-	  };
+	  }
+	|	{
+			label: TranslationKey;
+			render: (composer: ComposerAPI) => ReactNode;
+			condition?: () => boolean;
+		};
 
 export const formattingButtons: ReadonlyArray<FormattingButton> = [
 	{
@@ -46,8 +56,7 @@ export const formattingButtons: ReadonlyArray<FormattingButton> = [
 	},
 	{
 		label: 'Multi_line',
-		icon: 'multiline',
-		pattern: '```\n{{text}}\n``` ',
+		render: (composer) => <MultilineActionsToolbarDropdown composer={composer} />
 	},
 	{
 		label: 'KaTeX' as TranslationKey,

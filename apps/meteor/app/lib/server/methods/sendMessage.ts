@@ -118,7 +118,7 @@ Meteor.methods<ServerMethods>({
 			});
 		}
 
-		SystemLogger.error(`sendMessage method ${new Date().toISOString()}`);
+		SystemLogger.error(`sendMessage method ${message.msg}`);
 		try {
 			return executeSendMessage(uid, message);
 		} catch (error: any) {

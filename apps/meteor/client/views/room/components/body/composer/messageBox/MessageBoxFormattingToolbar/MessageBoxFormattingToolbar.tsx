@@ -36,36 +36,40 @@ const MessageBoxFormattingToolbar = ({ items, variant = 'large', composer, ...pr
 
 	return (
 		<>
-			{items.map((formatter) =>
-				'icon' in formatter ? (
-					<MessageComposerAction
-						{...props}
-						icon={formatter.icon}
-						key={formatter.label}
-						data-id={formatter.label}
-						title={t(formatter.label)}
-						onClick={(): void => {
-							if ('link' in formatter) {
-								window.open(formatter.link, '_blank', 'rel=noreferrer noopener');
-								return;
-							}
-							composer.wrapSelection(formatter.pattern);
-						}}
-					/>
-				) : (
-					<span
-						{...props}
-						{...(props.disabled && { style: { pointerEvents: 'none' } })}
-						className='rc-message-box__toolbar-formatting-item'
-						title={formatter.label}
-						key={formatter.label}
-					>
+			{items.map((formatter) => {
+				if ('render' in formatter) {
+					return formatter.render(composer)
+				} else {
+					return 'icon' in formatter ? (
+						<MessageComposerAction
+							{...props}
+							icon={formatter.icon}
+							key={formatter.label}
+							data-id={formatter.label}
+							title={t(formatter.label)}
+							onClick={(): void => {
+								if ('link' in formatter) {
+									window.open(formatter.link, '_blank', 'rel=noreferrer noopener');
+									return;
+								}
+								composer.wrapSelection(formatter.pattern);
+							}}
+						/>
+					) : (
+						<span
+							{...props}
+							{...(props.disabled && { style: { pointerEvents: 'none' } })}
+							className='rc-message-box__toolbar-formatting-item'
+							title={formatter.label}
+							key={formatter.label}
+						>
 						<a href={formatter.link} target='_blank' rel='noopener noreferrer' className='rc-message-box__toolbar-formatting-link'>
 							{formatter.text()}
 						</a>
 					</span>
-				),
-			)}
+					)
+				}
+			})}
 		</>
 	);
 };

@@ -242,7 +242,7 @@ export const sendMessage = async function (user, message, room, upsert = false) 
 	cleanupMessageObject(message);
 
 	parseUrlsInMessage(message);
-	SystemLogger.error(`sendMessage function before save message ${new Date().toISOString()}`);
+	SystemLogger.error(`sendMessage function before save message ${message.msg}`);
 	message = callbacks.run('beforeSaveMessage', message, room);
 	if (message) {
 		if (message.t === 'otr') {
@@ -277,7 +277,7 @@ export const sendMessage = async function (user, message, room, upsert = false) 
 			// so, we don't really care if it is successful or fails
 			void Apps.getBridges()?.getListenerBridge().messageEvent('IPostMessageSent', message);
 		}
-		SystemLogger.error(`sendMessage function message saved ${new Date().toISOString()}`);
+		SystemLogger.error(`sendMessage function message saved ${message.msg}`);
 
 		/*
 		Defer other updates as their return is not interesting to the user
@@ -285,7 +285,7 @@ export const sendMessage = async function (user, message, room, upsert = false) 
 
 		// Execute all callbacks
 		callbacks.runAsync('afterSaveMessage', message, room);
-		SystemLogger.error(`sendMessage function after save message ${new Date().toISOString()}`);
+		SystemLogger.error(`sendMessage function after save message ${message.msg}`);
 		return message;
 	}
 };
