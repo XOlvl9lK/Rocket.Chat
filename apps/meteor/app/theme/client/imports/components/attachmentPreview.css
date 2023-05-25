@@ -1,0 +1,11 @@
+.attachment-preview {}
+
+.attachment-preview .ReactCollapse--collapse {
+	min-height: 0;
+}
+
+.attachment-preview iframe {
+	border: none;
+	width: 100%;
+	height: 350px;
+}

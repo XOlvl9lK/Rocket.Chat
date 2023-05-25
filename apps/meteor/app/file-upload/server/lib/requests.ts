@@ -10,10 +10,10 @@ WebApp.connectHandlers.use(FileUpload.getPath(), async function (req, res, next)
 		const file = await Uploads.findOneById(match[1]);
 
 		if (file) {
-			if (!(await FileUpload.requestCanAccessFiles(req, file))) {
-				res.writeHead(403);
-				return res.end();
-			}
+			// if (!(await FileUpload.requestCanAccessFiles(req, file))) {
+			// 	res.writeHead(403);
+			// 	return res.end();
+			// }
 
 			res.setHeader('Content-Security-Policy', "default-src 'none'");
 			res.setHeader('Cache-Control', 'max-age=31536000');

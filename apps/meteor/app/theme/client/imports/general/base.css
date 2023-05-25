@@ -180,8 +180,8 @@ button {
 .ReactCollapse--collapse .expander {
 	position: absolute;
 	z-index: 5;
-	top: 20px;
 	right: 5px;
+	bottom: 20px;
 }
 
 .ReactCollapse--collapse .translucent {

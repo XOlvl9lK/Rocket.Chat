@@ -1,6 +1,6 @@
 import { MessageComposerAction } from '@rocket.chat/ui-composer';
 import { useTranslation } from '@rocket.chat/ui-contexts';
-import React, { memo } from 'react';
+import React, { memo, Fragment } from 'react';
 
 import type { FormattingButton } from '../../../../../../../../app/ui-message/client/messageBox/messageBoxFormatting';
 import type { ComposerAPI } from '../../../../../../../lib/chats/ChatAPI';
@@ -36,9 +36,9 @@ const MessageBoxFormattingToolbar = ({ items, variant = 'large', composer, ...pr
 
 	return (
 		<>
-			{items.map((formatter) => {
+			{items.map((formatter, idx) => {
 				if ('render' in formatter) {
-					return formatter.render(composer)
+					return <Fragment key={idx}>{formatter.render(composer)}</Fragment>
 				} else {
 					return 'icon' in formatter ? (
 						<MessageComposerAction

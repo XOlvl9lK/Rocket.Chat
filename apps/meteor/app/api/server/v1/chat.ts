@@ -511,6 +511,7 @@ API.v1.addRoute(
 			const { cursor, totalCount } = await Messages.findPaginatedPinnedByRoom(roomId, {
 				skip: offset,
 				limit: count,
+				sort: { ts: -1 }
 			});
 
 			const [messages, total] = await Promise.all([cursor.toArray(), totalCount]);

@@ -17,6 +17,7 @@
 @import 'imports/components/modal.css';
 @import 'imports/components/messages.css';
 @import 'imports/components/emojiPicker.css';
+@import 'imports/components/attachmentPreview.css';
 
 /* Legacy theming */
 @import 'imports/general/theme_old.css';

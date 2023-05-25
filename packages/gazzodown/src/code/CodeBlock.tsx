@@ -62,10 +62,16 @@ const CodeBlock = ({ lines = [], language }: CodeBlockProps): ReactElement => {
 
 	const toggle = useCallback(() => setIsOpened(prev => !prev), [])
 
-	return (
-		<Collapse isOpened={isOpened}>
-			<ExpandIcon onClick={toggle} isOpened={isOpened} />
-			<pre role='region'>
+	const isCollapseNeeded = useMemo(() => {
+		if (ref.current) {
+			const codeHeight = ref.current?.getBoundingClientRect().height
+			return codeHeight > 60
+		}
+		return false
+	}, [ref.current])
+
+	const innerCodeBlock = useMemo(() => {
+		return <pre role='region'>
 				<span className='copyonly'>```</span>
 				<code
 					key={language + code}
@@ -76,9 +82,16 @@ const CodeBlock = ({ lines = [], language }: CodeBlockProps): ReactElement => {
 				</code>
 				<span className='copyonly'>```</span>
 			</pre>
+	}, [code, content, language])
+
+	return isCollapseNeeded ?
+		<Collapse isOpened={isOpened}>
+			<ExpandIcon onClick={toggle} isOpened={isOpened} />
+			{innerCodeBlock}
 			{!isOpened && <div className='translucent' />}
 		</Collapse>
-	);
+		:
+		innerCodeBlock
 };
 
 export default CodeBlock;

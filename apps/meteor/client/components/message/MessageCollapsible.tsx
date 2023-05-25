@@ -5,6 +5,7 @@ import React from 'react';
 import AttachmentDownload from './content/attachments/structure/AttachmentDownload';
 import AttachmentSize from './content/attachments/structure/AttachmentSize';
 import { useCollapse } from './hooks/useCollapse';
+import { AttachmentPreviewAction } from '/client/components/message/content/attachments/structure/AttachmentPreviewAction';
 
 type MessageCollapsibleProps = {
 	children?: ReactNode;
@@ -13,9 +14,11 @@ type MessageCollapsibleProps = {
 	link?: string;
 	size?: number;
 	isCollapsed?: boolean;
+	format?: string;
+	togglePreview?: () => void
 };
 
-const MessageCollapsible = ({ children, title, hasDownload, link, size, isCollapsed }: MessageCollapsibleProps): ReactElement => {
+const MessageCollapsible = ({ children, title, hasDownload, link, size, isCollapsed, format, togglePreview }: MessageCollapsibleProps): ReactElement => {
 	const [collapsed, collapse] = useCollapse(isCollapsed);
 
 	return (
@@ -26,6 +29,7 @@ const MessageCollapsible = ({ children, title, hasDownload, link, size, isCollap
 				</Box>
 				{size && <AttachmentSize size={size} />} {collapse}
 				{hasDownload && link && <AttachmentDownload title={title} href={link} />}
+				<AttachmentPreviewAction title={title} format={format} togglePreview={togglePreview} />
 			</Box>
 			{!collapsed && children}
 		</>
