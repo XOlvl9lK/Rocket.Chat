@@ -6,11 +6,27 @@ import { memo } from 'react';
 export type UserStatusProps = {
 	small?: boolean;
 	statusText?: string;
+	statusEmoji?: { className: string, name: string, image: string, content: string }
 } & ComponentProps<typeof StatusBullet>;
 
-function UserStatus({ small, status, statusText, ...props }: UserStatusProps): ReactElement {
+function UserStatus({ small, status, statusText, statusEmoji, ...props }: UserStatusProps): ReactElement {
 	const size = small ? 'small' : 'large';
 	const t = useTranslation();
+
+	if (statusEmoji) {
+		return <div style={{ width: '26px' }}>
+			<span
+				title={statusText}
+				className={`${['rcx-message__emoji', statusEmoji.className].join(' ')} ${statusEmoji.name}`}
+				style={{
+					...(statusEmoji?.image && statusEmoji?.image.length ? { backgroundImage: statusEmoji.image } : {}),
+				}}
+			>
+			{statusEmoji.content}
+		</span>
+		</div>
+	}
+
 	switch (status) {
 		case 'online':
 			return <StatusBullet size={size} status={status} title={statusText || t('Online')} {...props} />;

@@ -32,7 +32,7 @@ if (process.env.DISABLE_MESSAGE_PARSER !== 'true') {
 	);
 }
 
-const messageTextToAstMarkdown = (messageText: string): Root => {
+export const messageTextToAstMarkdown = (messageText: string): Root => {
 	const customDomains = settings.get<string>('Message_CustomDomain_AutoLink')
 		? settings
 				.get<string>('Message_CustomDomain_AutoLink')

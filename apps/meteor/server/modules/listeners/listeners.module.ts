@@ -126,15 +126,15 @@ export class ListenersModule {
 		);
 
 		service.onEvent('presence.status', ({ user }) => {
-			const { _id, username, name, status, statusText, roles, isOnCall } = user;
+			const { _id, username, name, status, statusText, roles, isOnCall, statusEmoji } = user;
 			if (!status) {
 				return;
 			}
 
-			notifications.notifyLoggedInThisInstance('user-status', [_id, username, STATUS_MAP[status], statusText, name, roles, isOnCall]);
+			notifications.notifyLoggedInThisInstance('user-status', [_id, username, STATUS_MAP[status], statusText, name, roles, isOnCall, statusEmoji]);
 
 			if (_id) {
-				notifications.sendPresence(_id, [username, STATUS_MAP[status], statusText, isOnCall]);
+				notifications.sendPresence(_id, [username, STATUS_MAP[status], statusText, isOnCall, statusEmoji]);
 			}
 		});
 

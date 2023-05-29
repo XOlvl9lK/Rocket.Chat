@@ -128,6 +128,8 @@ export interface IUser extends IRocketChatRecord {
 	services?: IUserServices;
 	emails?: IUserEmail[];
 	status?: UserStatus;
+	statusEmoji?: string;
+	statusPeriod?: [string, string]
 	statusConnection?: string;
 	lastLogin?: Date;
 	bio?: string;
@@ -178,6 +180,11 @@ export interface IUser extends IRocketChatRecord {
 	};
 	importIds?: string[];
 	isOnCall?: boolean;
+	customStatuses: Array<{
+		statusText: string;
+		statusEmoji: string;
+		status?: UserStatus;
+	}>
 }
 
 export interface IRegisterUser extends IUser {

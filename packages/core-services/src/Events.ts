@@ -104,7 +104,7 @@ export type EventSignatures = {
 		};
 	}): void;
 	'presence.status'(data: {
-		user: Pick<IUser, '_id' | 'username' | 'status' | 'statusText' | 'name' | 'roles' | 'isOnCall'>;
+		user: Pick<IUser, '_id' | 'username' | 'status' | 'statusText' | 'name' | 'roles' | 'isOnCall' | 'statusEmoji'>;
 		previousStatus: UserStatus | undefined;
 	}): void;
 	'watch.messages'(data: { clientAction: ClientAction; message: Partial<IMessage> }): void;

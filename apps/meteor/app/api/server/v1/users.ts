@@ -40,6 +40,7 @@ import { getUploadFormData } from '../lib/getUploadFormData';
 import { getPaginationItems } from '../helpers/getPaginationItems';
 import { getUserFromParams } from '../helpers/getUserFromParams';
 import { isUserFromParams } from '../helpers/isUserFromParams';
+import { scheduleUserStatusChange } from '/app/api/server/helpers/scheduleUserStatusChange';
 
 API.v1.addRoute(
 	'users.getAvatar',
@@ -849,6 +850,7 @@ API.v1.addRoute(
 					statusText: 1,
 					avatarETag: 1,
 					isOnCall: 1,
+					statusEmoji: 1,
 				},
 			};
 
@@ -1106,19 +1108,21 @@ API.v1.addRoute(
 	{ authRequired: true },
 	{
 		async post() {
-			check(
-				this.bodyParams,
-				Match.OneOf(
-					Match.ObjectIncluding({
-						status: Match.Maybe(String),
-						message: String,
-					}),
-					Match.ObjectIncluding({
-						status: String,
-						message: Match.Maybe(String),
-					}),
-				),
-			);
+			// check(
+			// 	this.bodyParams,
+			// 	Match.OneOf(
+			// 		Match.ObjectIncluding({
+			// 			status: Match.Maybe(String),
+			// 			message: String,
+			// 			statusEmoji: Match.Maybe(String)
+			// 		}),
+			// 		Match.ObjectIncluding({
+			// 			status: String,
+			// 			message: Match.Maybe(String),
+			// 			statusEmoji: Match.Maybe(String),
+			// 		}),
+			// 	),
+			// );
 
 			if (!settings.get('Accounts_AllowUserStatusMessageChange')) {
 				throw new Meteor.Error('error-not-allowed', 'Change status is not allowed', {
@@ -1155,21 +1159,13 @@ API.v1.addRoute(
 						});
 					}
 
-					await Users.updateOne(
-						{ _id: user._id },
-						{
-							$set: {
-								status,
-								statusDefault: status,
-							},
-						},
-					);
-
-					const { _id, username, statusText, roles, name, isOnCall } = user;
-					void api.broadcast('presence.status', {
-						user: { status, _id, username, statusText, roles, name, isOnCall },
-						previousStatus: user.status,
-					});
+					await scheduleUserStatusChange({
+						userId: user._id,
+						period: this.bodyParams.period,
+						statusText: this.bodyParams.message,
+						statusEmoji: this.bodyParams.statusEmoji,
+						status: this.bodyParams.status
+					})
 				} else {
 					throw new Meteor.Error('error-invalid-status', 'Valid status types include online, away, offline, and busy.', {
 						method: 'users.setStatus',
@@ -1238,14 +1234,32 @@ API.v1.addRoute(
 				)
 			}
 
-			const { _id, username, statusText, roles, name } = user;
+			const { _id, username, statusText, roles, name, statusEmoji } = user;
 
 			void api.broadcast('presence.status', {
-				user: { status: user.status, _id, username, statusText, roles, name, isOnCall },
+				user: { status: user.status, _id, username, statusText, roles, name, isOnCall, statusEmoji },
 				previousStatus: user.status,
 			});
 
 			return API.v1.success();
+		}
+	}
+)
+
+API.v1.addRoute(
+	'users.getCustomStatuses',
+	{ authRequired: true },
+	{
+		async get() {
+			const user = await Users.findOneById(this.userId)
+
+			if (!user) {
+				return API.v1.unauthorized();
+			}
+
+			return API.v1.success({
+				customStatuses: user.customStatuses || []
+			})
 		}
 	}
 )
