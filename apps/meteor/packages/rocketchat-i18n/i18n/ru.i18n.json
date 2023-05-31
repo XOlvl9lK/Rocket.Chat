@@ -1533,6 +1533,7 @@
   "Discussions_unavailable_for_federation": "Обсуждения недоступны для федеративных чатов",
   "discussion-created": "__message__",
   "Discussions": "Обсуждение",
+  "Dismisses_Users": "Пользователь __username__ отклонил звонок",
   "Display": "Внешний вид списка чатов",
   "Display_avatars": "Отображение аватаров",
   "Display_Avatars_Sidebar": "Отображение аватаров в боковой панели",

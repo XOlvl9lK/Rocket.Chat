@@ -16,7 +16,7 @@ import { getAvatarAsPng } from '/client/lib/utils/getAvatarAsPng';
 
 type DesktopApi = typeof window & {
 	RocketChatDesktop?: {
-		openIncomingCallWindow?: (url: string, png: string, userId?: string) => void
+		openIncomingCallWindow?: (url: string, png: string, userId?: string, callId?: string, rid?: string, sender?: string) => void
 	};
 };
 
@@ -48,10 +48,10 @@ function notifyNewMessageAudio(rid?: string): void {
 	}
 }
 
-function showIncomingCallDesktopWindow(callUrl: string, png: string, userId?: string) {
+function showIncomingCallDesktopWindow(callUrl: string, png: string, userId?: string, callId?: string, rid?: string, sender?: string) {
 	const desktopWindow = window as DesktopApi
 	if (desktopWindow.RocketChatDesktop?.openIncomingCallWindow) {
-		desktopWindow.RocketChatDesktop.openIncomingCallWindow(callUrl, png, userId)
+		desktopWindow.RocketChatDesktop.openIncomingCallWindow(callUrl, png, userId, callId, rid, sender)
 	}
 }
 
@@ -103,9 +103,16 @@ Meteor.startup(() => {
 
 			if (isVideoConf) {
 				notifyNewVideoConfAudio(notification.payload.rid);
-				if (notification.payload?.callUrl) {
+				if (notification.payload?.callUrl && notification.payload?.callId) {
 					getAvatarAsPng(notification.payload?.sender?.username, (png) => {
-						showIncomingCallDesktopWindow(notification.payload.callUrl, png, notification.payload.sender._id)
+						showIncomingCallDesktopWindow(
+							notification.payload.callUrl,
+							png,
+							Meteor.userId(),
+							notification.payload.callId,
+							notification.payload.rid,
+							notification.payload?.sender?.username,
+						)
 					})
 				}
 			} else {

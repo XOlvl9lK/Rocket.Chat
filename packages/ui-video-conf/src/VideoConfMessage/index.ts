@@ -10,6 +10,7 @@ import VideoConfMessageRow from './VideoConfMessageRow';
 import VideoConfMessageSkeleton from './VideoConfMessageSkeleton';
 import VideoConfMessageText from './VideoConfMessageText';
 import VideoConfMessageUserStack from './VideoConfMessageUserStack';
+import VideoConfMessageFooterButtons from './VideoConfMessageFooterButtons';
 
 export {
 	VideoConfMessage,
@@ -24,4 +25,5 @@ export {
 	VideoConfMessageActions,
 	VideoConfMessageUserStack,
 	VideoConfMessageFooterText,
+	VideoConfMessageFooterButtons,
 };

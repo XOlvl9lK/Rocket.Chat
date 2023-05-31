@@ -47,6 +47,7 @@ export async function notifyDesktopUser({
 			type: room.t,
 			name: room.name,
 			callUrl: call?.url,
+			callId: call?._id,
 			message: {
 				msg: message.msg,
 				t: message.t,

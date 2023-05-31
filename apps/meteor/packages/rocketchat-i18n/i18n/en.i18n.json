@@ -1636,6 +1636,7 @@
   "Discussions_unavailable_for_federation": "Discussions are unavailable for Federated rooms",
   "discussion-created": "__message__",
   "Discussions": "Discussions",
+  "Dismisses_Users": "User __username__ dismiss the call",
   "Moderation_Dismiss_reports": "Dismiss reports",
   "Display": "Display",
   "Display_avatars": "Display Avatars",

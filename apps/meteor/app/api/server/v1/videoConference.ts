@@ -203,3 +203,21 @@ API.v1.addRoute(
 		}
 	}
 );
+
+API.v1.addRoute(
+	'video-conference.dismiss',
+	{ authRequired: false },
+	{
+		async post() {
+			const { rid, calleeId, callId } = this.bodyParams;
+
+			if (!rid || !calleeId || !callId) {
+				return API.v1.failure('invalid-params');
+			}
+
+			await VideoConf.dismissCall(rid, calleeId, callId);
+
+			return API.v1.success();
+		}
+	}
+)

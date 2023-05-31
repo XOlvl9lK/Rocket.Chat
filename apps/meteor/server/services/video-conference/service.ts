@@ -443,6 +443,22 @@ export class VideoConfService extends ServiceClassInternal implements IVideoConf
 		}
 	}
 
+	public async dismissCall(rid: IRoom['_id'], calleeId: IUser['_id'], callId: VideoConference['_id']) {
+		const [user, call] = await Promise.all([
+			Users.findOneById(calleeId),
+			VideoConferenceModel.findOneById(callId)
+		])
+
+		if (!user || !call) return;
+
+		await VideoConferenceModel.updateOne(
+			{ _id: callId },
+			{ $addToSet: { dismissers: { _id: user._id, username: user.username }}}
+		)
+
+		this.notifyVideoConfUpdate(rid, callId)
+	}
+
 	private notifyUser(
 		userId: IUser['_id'],
 		action: string,

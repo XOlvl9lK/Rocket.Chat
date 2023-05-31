@@ -13,9 +13,11 @@ import {
   VideoConfMessageContent,
   VideoConfMessageActions,
   VideoConfMessageAction,
+  VideoConfMessageFooterButtons,
 } from '@rocket.chat/ui-video-conf';
 import type { MouseEventHandler, ReactElement } from 'react';
 import { useContext, memo, useCallback } from 'react';
+import { Box } from '@rocket.chat/fuselage';
 
 import { useSurfaceType } from '../../contexts/SurfaceContext';
 import type { BlockProps } from '../../utils/BlockProps';
@@ -180,24 +182,31 @@ const VideoConferenceBlock = ({
           </VideoConfMessageActions>
         </VideoConfMessageRow>
         <VideoConfMessageFooter>
-          <VideoConfMessageButton primary onClick={joinHandler}>
-            {t('Join')}
-          </VideoConfMessageButton>
-          <VideoConfMessageButton primary onClick={inviteHandler}>
-            {t('Invite_to_call')}
-          </VideoConfMessageButton>
-          {Boolean(data.users.length) && (
-            <>
-              <VideoConfMessageUserStack users={data.users} />
-              <VideoConfMessageFooterText>
-                {data.users.length > MAX_USERS
-                  ? t('__usersCount__member_joined', {
+          <VideoConfMessageFooterButtons>
+            <VideoConfMessageButton primary onClick={joinHandler}>
+              {t('Join')}
+            </VideoConfMessageButton>
+            <VideoConfMessageButton primary onClick={inviteHandler}>
+              {t('Invite_to_call')}
+            </VideoConfMessageButton>
+            {Boolean(data.users.length) && (
+              <>
+                <VideoConfMessageUserStack users={data.users} />
+                <VideoConfMessageFooterText>
+                  {data.users.length > MAX_USERS
+                    ? t('__usersCount__member_joined', {
                       usersCount: data.users.length - MAX_USERS,
                     })
-                  : t('joined')}
-              </VideoConfMessageFooterText>
-            </>
-          )}
+                    : t('joined')}
+                </VideoConfMessageFooterText>
+              </>
+            )}
+          </VideoConfMessageFooterButtons>
+          {data.dismissers?.map(dismisser => {
+            return <Box fontScale='c1' mi='x4' margin='5px 0 0 0'>
+              {t('Dismisses_Users', { username: dismisser.username })}
+            </Box>
+          })}
         </VideoConfMessageFooter>
       </VideoConfMessage>
     );
