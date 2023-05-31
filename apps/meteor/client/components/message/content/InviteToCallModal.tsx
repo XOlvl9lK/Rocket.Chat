@@ -1,4 +1,4 @@
-import { Modal, Field, Button, MultiSelectFiltered, AutoComplete, Box, Option, OptionAvatar, OptionContent, Chip } from '@rocket.chat/fuselage';
+import { Modal, Field, Button, AutoComplete, Box, Option, OptionAvatar, OptionContent, Chip } from '@rocket.chat/fuselage';
 import { useDebouncedValue } from '@rocket.chat/fuselage-hooks';
 import { useTranslation, useEndpoint, useUser } from '@rocket.chat/ui-contexts';
 import React, { useState, useCallback, ReactElement, useMemo } from 'react';
@@ -6,7 +6,6 @@ import { useQuery } from '@tanstack/react-query';
 import { VideoConfManager } from '/client/lib/VideoConfManager';
 import { dispatchToastMessage } from '/client/lib/toast';
 import UserAvatar from '/client/components/avatar/UserAvatar';
-import RoomAvatar from '/client/components/avatar/RoomAvatar';
 
 type InviteToCallModalProps = {
 	onClose: () => void

@@ -8,7 +8,7 @@ type AttachmentPreviewProps = {
 	togglePreview?: () => void
 }
 
-const availableForPreviewFormats = [
+export const availableForPreviewFormats = [
 	'doc',
 	'docx',
 	'odt',
@@ -22,7 +22,8 @@ const availableForPreviewFormats = [
 	'ttf',
 	'txt',
 	'html',
-	'xml'
+	'xml',
+	'sql'
 ]
 
 export const AttachmentPreviewAction = ({ togglePreview, title, format }: AttachmentPreviewProps) => {

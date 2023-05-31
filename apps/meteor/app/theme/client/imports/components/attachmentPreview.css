@@ -1,11 +1,16 @@
 .attachment-preview {}
 
-.attachment-preview .ReactCollapse--collapse {
-	min-height: 0;
-}
-
 .attachment-preview iframe {
 	border: none;
 	width: 100%;
-	height: 350px;
+	height: 70vh;
+}
+
+.attachment-preview-title {
+	cursor: pointer;
+	color: #095AD2 !important;
+}
+
+.attachment-preview-title:hover {
+	text-decoration: underline;
 }

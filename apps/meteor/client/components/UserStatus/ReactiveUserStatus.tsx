@@ -13,15 +13,15 @@ type ReactiveUserStatusProps = {
 const ReactiveUserStatus = ({ uid, ...props }: ReactiveUserStatusProps): ReactElement => {
 	const presence = usePresence(uid);
 
-	const statusText = presence?.statusText
+	const statusText = presence?.statusText;
 	const status = presence?.status;
 	const isOnCall = presence?.isOnCall;
-	const statusEmoji = presence?.statusEmoji
+	const statusEmoji = presence?.statusEmoji;
 
 	const [emojiResult] = useMemo(() => {
-		if (!statusEmoji) return []
-		return detectEmoji(statusEmoji)
-	}, [statusEmoji])
+		if (!statusEmoji) return [];
+		return detectEmoji(statusEmoji);
+	}, [statusEmoji]);
 
 	if (isOnCall && status !== 'offline') {
 		return <Icon name='phone' size='x16' />;

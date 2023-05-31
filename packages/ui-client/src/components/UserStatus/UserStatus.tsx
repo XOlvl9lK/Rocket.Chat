@@ -13,7 +13,7 @@ function UserStatus({ small, status, statusText, statusEmoji, ...props }: UserSt
 	const size = small ? 'small' : 'large';
 	const t = useTranslation();
 
-	if (statusEmoji) {
+	if (statusEmoji && status !== 'offline') {
 		return <div style={{ width: '26px' }}>
 			<span
 				title={statusText}

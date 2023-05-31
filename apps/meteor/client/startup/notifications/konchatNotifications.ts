@@ -12,6 +12,13 @@ import { getUserPreference } from '../../../app/utils/client';
 import { RoomManager } from '../../lib/RoomManager';
 import { fireGlobalEvent } from '../../lib/utils/fireGlobalEvent';
 import { isLayoutEmbedded } from '../../lib/utils/isLayoutEmbedded';
+import { getAvatarAsPng } from '/client/lib/utils/getAvatarAsPng';
+
+type DesktopApi = typeof window & {
+	RocketChatDesktop?: {
+		openIncomingCallWindow?: (url: string, png: string, userId?: string) => void
+	};
+};
 
 const notifyNewRoom = async (sub: ISubscription): Promise<void> => {
 	const user = Meteor.user() as IUser | null;
@@ -38,6 +45,13 @@ function notifyNewMessageAudio(rid?: string): void {
 	} else if (!hasFocus || !messageIsInOpenedRoom || !muteFocusedConversations) {
 		// Play a notification sound
 		void KonchatNotification.newMessage(rid);
+	}
+}
+
+function showIncomingCallDesktopWindow(callUrl: string, png: string, userId?: string) {
+	const desktopWindow = window as DesktopApi
+	if (desktopWindow.RocketChatDesktop?.openIncomingCallWindow) {
+		desktopWindow.RocketChatDesktop.openIncomingCallWindow(callUrl, png, userId)
 	}
 }
 
@@ -88,7 +102,12 @@ Meteor.startup(() => {
 			}
 
 			if (isVideoConf) {
-				notifyNewVideoConfAudio(notification.payload.rid)
+				notifyNewVideoConfAudio(notification.payload.rid);
+				if (notification.payload?.callUrl) {
+					getAvatarAsPng(notification.payload?.sender?.username, (png) => {
+						showIncomingCallDesktopWindow(notification.payload.callUrl, png, notification.payload.sender._id)
+					})
+				}
 			} else {
 				notifyNewMessageAudio(notification.payload.rid);
 			}

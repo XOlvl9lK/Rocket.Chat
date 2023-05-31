@@ -22,7 +22,7 @@
 
 .emoji-picker {
 	position: absolute;
-	z-index: 9999;
+	z-index: 1000000;
 
 	display: none;
 	flex-direction: column;

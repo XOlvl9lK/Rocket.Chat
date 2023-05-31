@@ -196,6 +196,7 @@ export class Presence extends ServiceClass implements IPresence {
 				statusText: 1,
 				roles: 1,
 				status: 1,
+				statusEmoji: 1,
 			},
 		});
 		if (!user) {
@@ -214,12 +215,13 @@ export class Presence extends ServiceClass implements IPresence {
 		});
 
 		if (result.modifiedCount > 0) {
-			this.broadcast({ _id: uid, username: user.username, status, statusText: user.statusText, roles: user.roles }, user.status);
+			// @ts-ignore
+			this.broadcast({ _id: uid, username: user.username, status, statusText: user.statusText, roles: user.roles, statusEmoji: user.statusEmoji }, user.status);
 		}
 	}
 
 	private broadcast(
-		user: Pick<IUser, '_id' | 'username' | 'status' | 'statusText' | 'roles'>,
+		user: Pick<IUser, '_id' | 'username' | 'status' | 'statusText' | 'roles' | 'statusEmoji'>,
 		previousStatus: UserStatus | undefined,
 	): void {
 		if (!this.broadcastEnabled) {

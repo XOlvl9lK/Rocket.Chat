@@ -8,14 +8,18 @@ import {
 } from '@rocket.chat/fuselage';
 import { useMediaUrl } from '@rocket.chat/ui-contexts';
 import type { FC } from 'react';
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 
 import { getFileExtension } from '../../../../../../lib/utils/getFileExtension';
 import MarkdownText from '../../../../MarkdownText';
 import MessageCollapsible from '../../../MessageCollapsible';
 import MessageContentBody from '../../../MessageContentBody';
 import AttachmentSize from '../structure/AttachmentSize';
-import { AttachmentPreview } from '/client/components/message/content/attachments/structure/AttachmentPreview';
+import { AttachmentPreviewModal } from '/client/components/message/content/attachments/structure/AttachmentPreviewModal';
+import { imperativeModal } from '/client/lib/imperativeModal';
+import {
+	availableForPreviewFormats
+} from '/client/components/message/content/attachments/structure/AttachmentPreviewAction';
 
 export const GenericFileAttachment: FC<MessageAttachmentBase> = ({
 	title,
@@ -28,15 +32,15 @@ export const GenericFileAttachment: FC<MessageAttachmentBase> = ({
 	collapsed,
 }) => {
 	const getURL = useMediaUrl();
-	const [isPreviewOpen, setIsPreviewOpen] = useState(false)
-	const [uri, setUri] = useState<string>()
+
+	const isPreviewAvailable = useMemo(() => availableForPreviewFormats.includes((format || getFileExtension(title)).toLowerCase()), [format, title])
 
 	const togglePreview = useCallback(() => {
-		setIsPreviewOpen(prev => {
-			if (!uri && !prev) setUri(link)
-			return !prev
+		imperativeModal.open({
+			component: AttachmentPreviewModal,
+			props: { uri: link }
 		})
-	}, [uri, link])
+	}, [link])
 
 	return (
 		<>
@@ -53,13 +57,22 @@ export const GenericFileAttachment: FC<MessageAttachmentBase> = ({
 					<MessageGenericPreviewContent
 						thumb={<MessageGenericPreviewIcon name='attachment-file' type={format || getFileExtension(title)} />}
 					>
-						<MessageGenericPreviewTitle
-							externalUrl={hasDownload && link ? getURL(link) : undefined}
-							data-qa-type='attachment-title-link'
-							download={hasDownload}
-						>
-							{title}
-						</MessageGenericPreviewTitle>
+						{isPreviewAvailable ?
+							<span
+								className='rcx-message-generic-preview__title attachment-preview-title'
+								onClick={togglePreview}
+							>
+								{title}
+							</span>
+							:
+							<MessageGenericPreviewTitle
+								externalUrl={hasDownload && link ? getURL(link) : undefined}
+								data-qa-type='attachment-title-link'
+								download={hasDownload}
+							>
+								{title}
+							</MessageGenericPreviewTitle>
+						}
 						{size && (
 							<MessageGenericPreviewDescription>
 								<AttachmentSize size={size} wrapper={false} />
@@ -67,7 +80,6 @@ export const GenericFileAttachment: FC<MessageAttachmentBase> = ({
 						)}
 					</MessageGenericPreviewContent>
 				</MessageGenericPreview>
-				<AttachmentPreview isOpened={isPreviewOpen} uri={uri} />
 			</MessageCollapsible>
 		</>
 	);

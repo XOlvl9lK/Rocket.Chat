@@ -8,6 +8,7 @@ type ScheduleUserStatusChangeProps = {
 	status: string
 	statusText?: string
 	statusEmoji?: string
+
 }
 
 export const scheduleUserStatusChange = async ({ period, ...params }: ScheduleUserStatusChangeProps) => {
@@ -48,12 +49,15 @@ const changeStatus = async ({ statusEmoji, statusText, status, userId }: ChangeS
 	const customStatuses = user.customStatuses || []
 
 	if (statusEmoji || statusText) {
-		if (customStatuses.length >= 10) customStatuses.shift()
-		customStatuses.push({
-			statusText,
-			statusEmoji,
-			status
-		})
+		const isCustomStatusAlreadySaved = customStatuses.find(s => s.status === status && s.statusText === statusText && s.statusEmoji === statusEmoji)
+		if (!isCustomStatusAlreadySaved) {
+			if (customStatuses.length >= 10) customStatuses.shift()
+			customStatuses.push({
+				statusText,
+				statusEmoji,
+				status
+			})
+		}
 	}
 
 	await Users.updateOne(
@@ -62,7 +66,7 @@ const changeStatus = async ({ statusEmoji, statusText, status, userId }: ChangeS
 			$set: {
 				status,
 				statusDefault: status,
-				statusEmoji,
+				statusEmoji: statusEmoji || null,
 				statusText,
 				customStatuses,
 			}

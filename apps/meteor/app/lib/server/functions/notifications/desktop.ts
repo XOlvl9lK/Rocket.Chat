@@ -1,5 +1,6 @@
 import { api } from '@rocket.chat/core-services';
 import type { IMessage, IRoom, IUser } from '@rocket.chat/core-typings';
+import { VideoConference } from '@rocket.chat/models';
 
 import { roomCoordinator } from '../../../../../server/lib/rooms/roomCoordinator';
 import { metrics } from '../../../../metrics/server';
@@ -32,6 +33,8 @@ export async function notifyDesktopUser({
 }): Promise<void> {
 	const { title, text } = await roomCoordinator.getRoomDirectives(room.t).getNotificationDetails(room, user, notificationMessage, userId);
 
+	const call = await VideoConference.findOneById(message?.blocks?.[0]?.callId)
+
 	const payload = {
 		title: title || '',
 		text,
@@ -43,6 +46,7 @@ export async function notifyDesktopUser({
 			sender: message.u,
 			type: room.t,
 			name: room.name,
+			callUrl: call?.url,
 			message: {
 				msg: message.msg,
 				t: message.t,
