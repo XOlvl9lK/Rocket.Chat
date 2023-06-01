@@ -55,10 +55,6 @@ export const formattingButtons: ReadonlyArray<FormattingButton> = [
 		pattern: '`{{text}}`',
 	},
 	{
-		label: 'Multi_line',
-		render: (composer) => <MultilineActionsToolbarDropdown composer={composer} />
-	},
-	{
 		label: 'KaTeX' as TranslationKey,
 		icon: 'katex',
 		text: () => {

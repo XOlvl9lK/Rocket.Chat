@@ -209,6 +209,7 @@ function cleanupMessageObject(message) {
 }
 
 export const sendMessage = async function (user, message, room, upsert = false) {
+	console.log('send message', message);
 	if (!user || !message || !room._id) {
 		return false;
 	}

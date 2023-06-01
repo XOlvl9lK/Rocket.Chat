@@ -44,6 +44,9 @@ import { useMessageBoxAutoFocus } from './hooks/useMessageBoxAutoFocus';
 import { MessageEditor, EditorManager } from './MessageEditor';
 import { useIsSelecting } from '/client/views/room/MessageList/contexts/SelectedMessagesContext';
 import SelectedMessagesActions from '/client/views/room/components/body/composer/messageBox/SelectedMessagesActions';
+import {
+	MultilineActionsToolbarDropdown
+} from '/client/views/room/components/body/composer/messageBox/MessageBoxActionsToolbar/MultilineActionsToolbarDropdown';
 
 const reducer = (_: unknown, event: FormEvent<HTMLInputElement>): boolean => {
 	const target = event.target as HTMLInputElement;
@@ -453,6 +456,7 @@ const MessageBox = ({
 										disabled={isRecording || !canSend}
 									/>
 								)}
+								<MultilineActionsToolbarDropdown composer={chat.composer!} />
 								<MessageComposerActionsDivider />
 								<MessageBoxActionsToolbar
 									variant={sizes.inlineSize < 480 ? 'small' : 'large'}

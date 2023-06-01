@@ -424,14 +424,16 @@ export class VideoConfService extends ServiceClassInternal implements IVideoConf
 
 		const call = await VideoConferenceModel.findOneById(callId);
 
-		const record = {
-			t: 'videoconf',
-			msg: '',
-			groupable: false,
-			blocks: [this.buildVideoConfBlock(call._id)],
-		}
+
 
 		for (let room of rooms) {
+			const record = {
+				t: 'videoconf',
+				msg: '',
+				groupable: false,
+				blocks: [this.buildVideoConfBlock(call._id)],
+			}
+
 			const message = await sendMessage(user, record, room, false)
 
 			const threadRecord = {
