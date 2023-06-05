@@ -1,10 +1,11 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import { Modal, IconButton, Box, Margins } from '@rocket.chat/fuselage';
 import { useTranslation } from '@rocket.chat/ui-contexts';
 import { imperativeModal } from '/client/lib/imperativeModal';
 
 type AttachmentPreviewProps = {
 	uri?: string
+	format: string
 }
 
 const GOOGLE_DOCS_VIEWER = 'https://docs.google.com/gview?embedded=true'
@@ -14,8 +15,10 @@ const getSrc = (uri: string) => {
 	return GOOGLE_DOCS_VIEWER + `&url=${fileLink}`
 }
 
-export const AttachmentPreviewModal = ({ uri }: AttachmentPreviewProps) => {
+export const AttachmentPreviewModal = ({ uri, format }: AttachmentPreviewProps) => {
 	const t = useTranslation();
+	const [sql, setSql] = useState('')
+	const isSql = format.toLowerCase() === 'sql'
 	const src = useMemo(() => {
 		if (!uri) return;
 		return getSrc(uri)
@@ -27,6 +30,17 @@ export const AttachmentPreviewModal = ({ uri }: AttachmentPreviewProps) => {
 			dialog.style.maxWidth = 'none'
 		}
 	}, [])
+
+	useEffect(() => {
+		(async () => {
+			if (uri && isSql) {
+				const decoder = new TextDecoder('utf-8')
+				const result = await fetch(window.location.origin + uri).then(res => res.arrayBuffer())
+				const decoded = decoder.decode(new Uint8Array(result))
+				setSql(decoded)
+			}
+		})()
+	}, [uri, isSql])
 
 	return (
 		<Modal w='70vw'>
@@ -50,8 +64,10 @@ export const AttachmentPreviewModal = ({ uri }: AttachmentPreviewProps) => {
 			</Modal.Header>
 			<Modal.Content>
 				<div className='attachment-preview'>
-					{src &&
-						<iframe
+					{isSql ?
+						sql && <SqlPreview sql={sql} />
+						:
+						src && <iframe
 							src={src}
 						/>
 					}
@@ -61,3 +77,15 @@ export const AttachmentPreviewModal = ({ uri }: AttachmentPreviewProps) => {
 		</Modal>
 	);
 };
+
+type SqlPreviewProps = {
+	sql: string
+}
+
+const SqlPreview = ({ sql }: SqlPreviewProps) => {
+	return <div style={{ whiteSpace: "pre-wrap", padding: '10px', backgroundColor: '#c6c6c6' }}>
+		<div style={{ backgroundColor: 'white', padding: '5px' }}>
+			{sql}
+		</div>
+	</div>
+}

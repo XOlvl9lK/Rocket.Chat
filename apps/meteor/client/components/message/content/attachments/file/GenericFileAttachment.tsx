@@ -38,7 +38,7 @@ export const GenericFileAttachment: FC<MessageAttachmentBase> = ({
 	const togglePreview = useCallback(() => {
 		imperativeModal.open({
 			component: AttachmentPreviewModal,
-			props: { uri: link }
+			props: { uri: link, format: format || getFileExtension(title) }
 		})
 	}, [link])
 
