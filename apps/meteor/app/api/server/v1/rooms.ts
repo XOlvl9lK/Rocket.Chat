@@ -628,3 +628,27 @@ API.v1.addRoute(
 		},
 	},
 );
+
+API.v1.addRoute(
+	'rooms.messageToMove',
+	{ authRequired: true },
+	{
+		async get() {
+			const { rid, date } = this.queryParams
+
+			if (!rid) {
+				throw new Meteor.Error('error-invalid-params');
+			}
+
+			if (!date) {
+				const message = await Messages.getStartOfRoom(rid)
+
+				return API.v1.success(message)
+			} else {
+				const message = await Messages.getFirstMessageFromDateInRoom(rid, date)
+
+				return API.v1.success(message)
+			}
+		}
+	}
+)

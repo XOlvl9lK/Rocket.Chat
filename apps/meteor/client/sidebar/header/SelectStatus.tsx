@@ -1,9 +1,8 @@
-import React, { forwardRef, useMemo } from 'react';
-import { Box, Field, Icon, MessageEmoji, Options, Select, Margins } from '@rocket.chat/fuselage';
+import React, { useMemo } from 'react';
+import { Box, Field, Icon, MessageEmoji, Select } from '@rocket.chat/fuselage';
 import { useSetting, useEndpoint } from '@rocket.chat/ui-contexts';
 import { useQuery } from '@tanstack/react-query';
 import { detectEmoji } from '/client/lib/utils/detectEmoji';
-import UserStatusMenu from '/client/components/UserStatusMenu';
 import { UserStatus } from '/client/components/UserStatus';
 
 type SelectStatusProps = {

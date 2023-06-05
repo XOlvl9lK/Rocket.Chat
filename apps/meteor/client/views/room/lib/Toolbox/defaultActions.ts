@@ -74,3 +74,12 @@ addAction('keyboard-shortcut-list', {
 	template: lazy(() => import('../../contextualBar/KeyboardShortcuts')),
 	order: 99,
 });
+
+addAction('move-to-message', {
+	groups: ['channel', 'group', 'direct', 'direct_multiple', 'team'],
+	id: 'move-to-message',
+	title: 'Move_to_message',
+	icon: 'jump',
+	template: lazy(() => import('../../contextualBar/MoveToMessage/MoveToMessage')),
+	order: 14
+})

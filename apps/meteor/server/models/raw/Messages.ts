@@ -1672,10 +1672,14 @@ export class MessagesRaw extends BaseRaw<IMessage> implements IMessagesModel {
 			tmid: originalMessageId
 		}
 
-		const message = await this.findOne(query)
-
-		console.log('message for delete', message);
-
 		return this.deleteOne(query)
+	}
+
+	async getStartOfRoom(rid: string) {
+		return this.findOne({ rid }, { sort: { ts: 1 }})
+	}
+
+	async getFirstMessageFromDateInRoom(rid: string, date: string) {
+		return this.findOne({ rid, ts: { $gte: new Date(date) }}, { sort: { ts: 1 }})
 	}
 }

@@ -23,7 +23,8 @@ export const availableForPreviewFormats = [
 	'txt',
 	'html',
 	'xml',
-	'sql'
+	'sql',
+	'csv'
 ]
 
 export const AttachmentPreviewAction = ({ togglePreview, title, format }: AttachmentPreviewProps) => {
