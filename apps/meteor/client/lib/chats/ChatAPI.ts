@@ -76,7 +76,7 @@ export type DataAPI = {
 	findNextOwnMessage(message: IMessage): Promise<IMessage | undefined>;
 	getNextOwnMessage(message: IMessage): Promise<IMessage>;
 	pushEphemeralMessage(message: Omit<IMessage, 'rid' | 'tmid'>): Promise<void>;
-	canUpdateMessage(message: IMessage): Promise<boolean>;
+	canUpdateMessage(message: IMessage, room?: IRoom): Promise<boolean>;
 	updateMessage(message: Pick<IMessage, '_id' | 't'> & Partial<Omit<IMessage, '_id' | 't'>>): Promise<void>;
 	canDeleteMessage(message: IMessage): Promise<boolean>;
 	deleteMessage(mid: IMessage['_id']): Promise<void>;
@@ -114,7 +114,7 @@ export type ChatAPI = {
 	readonly messageEditing: {
 		toPreviousMessage(): Promise<void>;
 		toNextMessage(): Promise<void>;
-		editMessage(message: IMessage, options?: { cursorAtStart?: boolean }): Promise<void>;
+		editMessage(message: IMessage, options?: { cursorAtStart?: boolean, room?: IRoom }): Promise<void>;
 	};
 
 	readonly currentEditing:

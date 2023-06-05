@@ -82,16 +82,16 @@ export const createDataAPI = ({ rid, tmid }: { rid: IRoom['_id']; tmid: IMessage
 		return message;
 	};
 
-	const canUpdateMessage = async (message: IMessage): Promise<boolean> => {
+	const canUpdateMessage = async (message: IMessage, room?: IRoom): Promise<boolean> => {
 		if (MessageTypes.isSystemMessage(message)) {
 			return false;
 		}
 
 		const canEditMessage = hasAtLeastOnePermission('edit-message', message.rid);
+		const canEditMessageInChannel = hasAtLeastOnePermission('edit-message-channel', message.rid);
 		const editAllowed = (settings.get('Message_AllowEditing') as boolean | undefined) ?? false;
 		const editOwn = message?.u && message.u._id === Meteor.userId();
-
-		if (!canEditMessage && (!editAllowed || !editOwn)) {
+		if (!(room && canEditMessageInChannel && room?.t === 'c') && !canEditMessage && (!editAllowed || !editOwn)) {
 			return false;
 		}
 

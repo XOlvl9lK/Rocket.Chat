@@ -174,8 +174,8 @@ Meteor.startup(async function () {
 		label: 'Edit',
 		context: ['message', 'message-mobile', 'threads', 'federated'],
 		async action(_, props) {
-			const { message = messageArgs(this).msg, chat } = props;
-			await chat?.messageEditing.editMessage(message);
+			const { message = messageArgs(this).msg, chat, room } = props;
+			await chat?.messageEditing.editMessage(message, { room });
 		},
 		condition({ message, subscription, settings, room }) {
 			if (subscription == null) {
@@ -185,9 +185,10 @@ Meteor.startup(async function () {
 				return message.u._id === Meteor.userId();
 			}
 			const canEditMessage = hasAtLeastOnePermission('edit-message', message.rid);
+			const canEditMessageInChannel = hasAtLeastOnePermission('edit-message-channel', message.rid);
 			const isEditAllowed = settings.Message_AllowEditing;
 			const editOwn = message.u && message.u._id === Meteor.userId();
-			if (!(canEditMessage || (isEditAllowed && editOwn))) {
+			if (!(canEditMessageInChannel && room.t === 'c') && !(canEditMessage || (isEditAllowed && editOwn))) {
 				return false;
 			}
 			const blockEditInMinutes = settings.Message_AllowEditing_BlockEditInMinutes as number;

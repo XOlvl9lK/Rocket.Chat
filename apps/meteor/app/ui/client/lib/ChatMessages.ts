@@ -94,12 +94,11 @@ export class ChatMessages implements ChatAPI {
 
 			await this.currentEditing.cancel();
 		},
-		editMessage: async (message: IMessage, { cursorAtStart = false }: { cursorAtStart?: boolean } = {}) => {
+		editMessage: async (message: IMessage, { cursorAtStart = false, room }: { cursorAtStart?: boolean, room?: IRoom } = {}) => {
 			const text = (await this.data.getDraft(message._id)) || message.attachments?.[0]?.description || message.msg;
 
 			await this.currentEditing?.stop();
-
-			if (!this.composer || !(await this.data.canUpdateMessage(message))) {
+			if (!this.composer || !(await this.data.canUpdateMessage(message, room))) {
 				return;
 			}
 

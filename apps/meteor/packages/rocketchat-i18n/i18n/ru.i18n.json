@@ -1624,6 +1624,8 @@
   "edit-livechat-room-customfields": "Редактирование пользовательских полей чатов Livechat",
   "edit-livechat-room-customfields_description": "Разрешение на редактирование пользовательских полей чатов Livechat",
   "edit-message": "Редактировать сообщение",
+  "edit-message-channel": "Редактировать сообщение в канале",
+  "edit-message-channel_description": "Разрешение на редактирование сообщений в каналах",
   "edit-message_description": "Разрешение на редактирование сообщений в чатах",
   "edit-other-user-active-status": "Редактировать статус активности другого пользователя",
   "edit-other-user-active-status_description": "Разрешение на блокировку и разблокировку аккаунтов",

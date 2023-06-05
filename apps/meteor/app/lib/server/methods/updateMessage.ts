@@ -3,7 +3,7 @@ import { Match, check } from 'meteor/check';
 import moment from 'moment';
 import type { ServerMethods } from '@rocket.chat/ui-contexts';
 import type { IEditedMessage, IMessage } from '@rocket.chat/core-typings';
-import { Messages, Users } from '@rocket.chat/models';
+import { Messages, Users, Rooms } from '@rocket.chat/models';
 
 import { settings } from '../../../settings/server';
 import { canSendMessageAsync } from '../../../authorization/server/functions/canSendMessage';
@@ -58,10 +58,12 @@ Meteor.methods<ServerMethods>({
 		}
 
 		const _hasPermission = await hasPermissionAsync(uid, 'edit-message', message.rid);
+		const _hasPermissionInChannel = await hasPermissionAsync(uid, 'edit-message-channel', message.rid);
+		const room = await Rooms.findOneById(message.rid);
 		const editAllowed = settings.get('Message_AllowEditing');
 		const editOwn = originalMessage.u && originalMessage.u._id === uid;
 
-		if (!_hasPermission && (!editAllowed || !editOwn)) {
+		if (!(_hasPermissionInChannel && room.t === 'c') && !(_hasPermission || (editAllowed && editOwn))) {
 			throw new Meteor.Error('error-action-not-allowed', 'Message editing not allowed', {
 				method: 'updateMessage',
 				action: 'Message_editing',

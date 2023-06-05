@@ -38,6 +38,7 @@ export const upsertPermissions = async (): Promise<void> => {
 		{ _id: 'delete-p', roles: ['admin', 'owner'] },
 		{ _id: 'delete-user', roles: ['admin'] },
 		{ _id: 'edit-message', roles: ['admin', 'owner', 'moderator'] },
+		{ _id: 'edit-message-channel', roles: ['admin', 'owner', 'user', 'moderator'] },
 		{ _id: 'edit-other-user-active-status', roles: ['admin'] },
 		{ _id: 'edit-other-user-info', roles: ['admin'] },
 		{ _id: 'edit-other-user-password', roles: ['admin'] },

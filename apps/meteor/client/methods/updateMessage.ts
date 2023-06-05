@@ -5,7 +5,7 @@ import { Tracker } from 'meteor/tracker';
 import moment from 'moment';
 
 import { hasAtLeastOnePermission, hasPermission } from '../../app/authorization/client';
-import { ChatMessage } from '../../app/models/client';
+import { ChatMessage, ChatRoom } from '../../app/models/client';
 import { settings } from '../../app/settings/client';
 import { t } from '../../app/utils/client';
 import { callbacks } from '../../lib/callbacks';
@@ -24,7 +24,9 @@ Meteor.methods<ServerMethods>({
 			return;
 		}
 		const canEditMessage = hasAtLeastOnePermission('edit-message', message.rid);
+		const canEditMessageInChannel = hasAtLeastOnePermission('edit-message-channel', message.rid);
 		const editAllowed = settings.get('Message_AllowEditing');
+		const room = ChatRoom.findOne(message.rid)
 		let editOwn = false;
 
 		const msgText = originalMessage?.attachments?.[0]?.description ?? originalMessage.msg;
@@ -42,7 +44,7 @@ Meteor.methods<ServerMethods>({
 			return;
 		}
 
-		if (!(canEditMessage || (editAllowed && editOwn))) {
+		if (!(canEditMessageInChannel && room.t === 'c') && !(canEditMessage || (editAllowed && editOwn))) {
 			dispatchToastMessage({
 				type: 'error',
 				message: t('error-action-not-allowed', { action: t('Message_editing') }),
