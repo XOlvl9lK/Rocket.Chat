@@ -3,6 +3,7 @@ import { useSyncExternalStore } from 'use-sync-external-store/shim';
 import { useUser } from '@rocket.chat/ui-contexts';
 
 import { selectedMessageStore, TSelectMessageStore } from '../../providers/SelectedMessagesProvider';
+import { useRoom } from '/client/views/room/contexts/RoomContext';
 
 type SelectMessageContextValue = {
 	selectedMessageStore: TSelectMessageStore;
@@ -61,13 +62,14 @@ export const useCountSelected = (): number => {
 export const useCanDeleteSelectedMessages = (): boolean => {
 	const { selectedMessageStore } = useContext(SelectedMessageContext);
 	const user = useUser();
+	const room = useRoom();
 
 	const subscribe = useCallback(
 		(callback: () => void): (() => void) => selectedMessageStore.on('change', callback),
 		[selectedMessageStore],
 	)
 
-	const getSnapshot = useCallback(() => selectedMessageStore.canDeleteSelectedMessages(user), [user]);
+	const getSnapshot = useCallback(() => selectedMessageStore.canDeleteSelectedMessages(room._id), [user, room]);
 
 	return useSyncExternalStore(subscribe, getSnapshot);
 }

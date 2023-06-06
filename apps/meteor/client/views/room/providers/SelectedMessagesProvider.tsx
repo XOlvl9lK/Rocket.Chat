@@ -1,9 +1,13 @@
 import { Emitter } from '@rocket.chat/emitter';
 import type { FC } from 'react';
 import React, { useMemo } from 'react';
-import type { IMessage } from '@rocket.chat/core-typings';
+import type { IMessage, IRoom } from '@rocket.chat/core-typings';
 
 import { SelectedMessageContext } from '../MessageList/contexts/SelectedMessagesContext';
+import { MessageTypes } from '/app/ui-utils/lib/MessageTypes';
+import { hasPermission } from '/app/authorization/client';
+import { settings } from '/app/settings/client';
+import moment from 'moment/moment';
 
 // data-qa-select
 
@@ -63,9 +67,45 @@ export const selectedMessageStore = new (class SelectMessageStore extends Emitte
 		this.emit('toggleIsSelecting', false);
 	}
 
-	canDeleteSelectedMessages(user: any) {
+	canDeleteSelectedMessages(rid: IRoom['_id']) {
 		const selectedMessages = this.getSelectedMessages()
-		return !selectedMessages.find(m => m.u._id !== user._id)
+		return !selectedMessages.some(message => !this.canDeleteMessage(message, rid))
+	}
+
+	canDeleteMessage(message: IMessage, rid: IRoom['_id']) {
+		const uid = Meteor.userId();
+		if (!uid) {
+			return false;
+		}
+
+		if (MessageTypes.isSystemMessage(message)) {
+			return false;
+		}
+
+		const forceDeleteAllowed = hasPermission('force-delete-message', message.rid);
+		if (forceDeleteAllowed) {
+			return true;
+		}
+
+		const deletionEnabled = settings.get('Message_AllowDeleting') as boolean | undefined;
+		if (!deletionEnabled) {
+			return false;
+		}
+
+		const deleteAnyAllowed = hasPermission('delete-message', rid);
+		const deleteOwnAllowed = hasPermission('delete-own-message');
+		const deleteAllowed = deleteAnyAllowed || (deleteOwnAllowed && message?.u && message.u._id === Meteor.userId());
+
+		if (!deleteAllowed) {
+			return false;
+		}
+
+		const blockDeleteInMinutes = settings.get('Message_AllowDeleting_BlockDeleteInMinutes') as number | undefined;
+		const bypassBlockTimeLimit = hasPermission('bypass-time-limit-edit-and-delete');
+		const elapsedMinutes = moment().diff(message.ts, 'minutes');
+		const onTimeForDelete = bypassBlockTimeLimit || !blockDeleteInMinutes || !elapsedMinutes || elapsedMinutes <= blockDeleteInMinutes;
+
+		return deleteAllowed && onTimeForDelete;
 	}
 })();
 
