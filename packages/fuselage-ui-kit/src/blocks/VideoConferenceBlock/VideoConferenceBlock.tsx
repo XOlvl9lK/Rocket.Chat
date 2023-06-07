@@ -136,7 +136,7 @@ const VideoConferenceBlock = ({
                       ? t('__usersCount__member_joined', {
                           usersCount: data.users.length - MAX_USERS,
                         })
-                      : t('joined')}
+                      : t('Joined')}
                   </VideoConfMessageFooterText>
                 </>
               ) : (
@@ -189,21 +189,21 @@ const VideoConferenceBlock = ({
             <VideoConfMessageButton primary onClick={inviteHandler}>
               {t('Invite_to_call')}
             </VideoConfMessageButton>
-            {Boolean(data.users.length) && (
-              <>
-                <VideoConfMessageUserStack users={data.users} />
-                <VideoConfMessageFooterText>
-                  {data.users.length > MAX_USERS
-                    ? t('__usersCount__member_joined', {
-                      usersCount: data.users.length - MAX_USERS,
-                    })
-                    : t('joined')}
-                </VideoConfMessageFooterText>
-              </>
-            )}
           </VideoConfMessageFooterButtons>
+          {Boolean(data.users.length) && (
+            <Box margin='5px 0 0 0' display='flex' alignItems='center'>
+              <VideoConfMessageUserStack users={data.users} />
+              <VideoConfMessageFooterText>
+                {data.users.length > MAX_USERS
+                  ? t('__usersCount__member_joined', {
+                    usersCount: data.users.length - MAX_USERS,
+                  })
+                  : t('Joined')}
+              </VideoConfMessageFooterText>
+            </Box>
+          )}
           {data.dismissers?.map(dismisser => {
-            return <Box fontScale='c1' mi='x4' margin='5px 0 0 0'>
+            return <Box key={dismisser.username} fontScale='c1' mi='x4' margin='5px 0 0 0'>
               {t('Dismisses_Users', { username: dismisser.username })}
             </Box>
           })}

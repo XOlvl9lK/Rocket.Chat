@@ -21,7 +21,7 @@ import { TAPi18n } from 'meteor/rocketchat:tap-i18n';
 import type { IExportOperation, ILoginToken, IPersonalAccessToken, IUser, UserStatus } from '@rocket.chat/core-typings';
 import { Users, Subscriptions } from '@rocket.chat/models';
 import type { Filter } from 'mongodb';
-import { Team, api } from '@rocket.chat/core-services';
+import { Team, api, VideoConf } from '@rocket.chat/core-services';
 
 import { hasPermissionAsync } from '../../../authorization/server/functions/hasPermission';
 import { settings } from '../../../settings/server';
@@ -1215,7 +1215,7 @@ API.v1.addRoute(
 	{ authRequired: false },
 	{
 		async post() {
-			const { isOnCall, userId } = this.bodyParams
+			const { isOnCall, userId, callId } = this.bodyParams
 
 			const user = await Users.findOneById(userId)
 
@@ -1235,6 +1235,12 @@ API.v1.addRoute(
 			}
 
 			const { _id, username, statusText, roles, name, statusEmoji } = user;
+
+			if (isOnCall && callId) {
+				await VideoConf.addUser(callId, userId)
+			} else if (!isOnCall && callId) {
+				await VideoConf.removeUserFromCall(callId, userId)
+			}
 
 			void api.broadcast('presence.status', {
 				user: { status: user.status, _id, username, statusText, roles, name, isOnCall, statusEmoji },

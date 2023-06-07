@@ -8,22 +8,22 @@ export const useAmIOnCall = () => {
 	const user = useUser()
 
 	useEffect(() => {
-		if (!once.current && user?.id) {
-			AccountBox.setIsOnCall(user?._id, false);
+		if (!once.current && user?._id) {
+			AccountBox.setIsOnCall(user?._id, '', false);
 			once.current = true;
 		}
 	}, [user]);
 
-	const onCall = useCallback((windowId: string) => {
+	const onCall = useCallback((windowId: string, callId: string) => {
 		setOpenedCalls(prev => [...prev, windowId]);
-		AccountBox.setIsOnCall(user?._id, true);
+		AccountBox.setIsOnCall(user?._id, callId, true);
 	}, [user]);
 
-	const offCall = useCallback((windowId: string) => {
+	const offCall = useCallback((windowId: string, callId: string) => {
 		const restOpened = openedCalls.filter(id => id !== windowId);
 		setOpenedCalls(restOpened);
 		if (!restOpened.length) {
-			AccountBox.setIsOnCall(user?._id, false);
+			AccountBox.setIsOnCall(user?._id, callId, false);
 		}
 	}, [openedCalls, user]);
 

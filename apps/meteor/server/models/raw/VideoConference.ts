@@ -206,6 +206,12 @@ export class VideoConferenceRaw extends BaseRaw<VideoConference> implements IVid
 		});
 	}
 
+	public async removeUserById(callId: string, userId: string): Promise<void> {
+		await this.updateOneById(callId, {
+			$pull: { users: { _id: userId }}
+		})
+	}
+
 	public async setMessageById(callId: string, messageType: keyof VideoConference['messages'], messageId: string): Promise<void> {
 		await this.updateOneById(callId, {
 			$set: {

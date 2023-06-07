@@ -8,7 +8,7 @@ import { useUser } from '@rocket.chat/ui-contexts';
 
 type WindowMaybeDesktop = typeof window & {
 	RocketChatDesktop?: {
-		openInternalVideoChatWindow?: (url: string, options?: any) => void;
+		openInternalVideoChatWindow?: (url: string, userId?: string, callId?: string) => void;
 	};
 };
 
@@ -18,20 +18,20 @@ export const useVideoOpenCall = () => {
 	const { onCall, offCall } = useAmIOnCall()
 
 	const handleOpenCall = useCallback(
-		(callUrl: string) => {
+		async (callUrl: string, callId: string) => {
 			const windowMaybeDesktop = window as WindowMaybeDesktop;
 			const videoChatWindowId = uuidv4()
 			if (windowMaybeDesktop.RocketChatDesktop?.openInternalVideoChatWindow) {
-				windowMaybeDesktop.RocketChatDesktop.openInternalVideoChatWindow(callUrl, user?._id);
+				windowMaybeDesktop.RocketChatDesktop.openInternalVideoChatWindow(callUrl, user?._id, callId);
 			} else {
 				const open = () => window.open(callUrl);
 				const popup = open();
 
 				if (popup !== null) {
-					onCall(videoChatWindowId);
+					onCall(videoChatWindowId, callId);
 					const interval = setInterval(() => {
 						if (popup.closed) {
-							offCall(videoChatWindowId);
+							offCall(videoChatWindowId, callId);
 							clearInterval(interval);
 						}
 					}, 3000);

@@ -889,7 +889,7 @@ export class VideoConfService extends ServiceClassInternal implements IVideoConf
 		return 'Rocket.Chat';
 	}
 
-	private async getUrl(
+	public async getUrl(
 		call: VideoConference,
 		user?: AtLeast<IUser, '_id' | 'username' | 'name'>,
 		options: VideoConferenceJoinOptions = {},
@@ -984,6 +984,21 @@ export class VideoConfService extends ServiceClassInternal implements IVideoConf
 		}
 
 		await VideoConferenceModel.addUserById(call._id, { _id, username, name, avatarETag, ts });
+
+		if (call.type === 'direct') {
+			return this.updateDirectCall(call as IDirectVideoConference, _id);
+		}
+
+		this.notifyVideoConfUpdate(call.rid, call._id);
+	}
+
+	public async removeUserFromCall(callId: string, userId: string) {
+		await VideoConferenceModel.removeUserById(callId, userId)
+		const call = await VideoConferenceModel.findOneById(callId)
+
+		if (!call.users?.length && !call?.isOldUserInConf) {
+			return await this.endCall(callId)
+		}
 
 		if (call.type === 'direct') {
 			return this.updateDirectCall(call as IDirectVideoConference, _id);

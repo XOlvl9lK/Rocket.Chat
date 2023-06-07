@@ -69,6 +69,7 @@ export const AttachmentPreviewModal = ({ uri, format }: AttachmentPreviewProps) 
 						:
 						src && <iframe
 							src={src}
+							allow='clipboard-read; clipboard-write'
 						/>
 					}
 				</div>
